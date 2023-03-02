@@ -24,7 +24,7 @@ public class Main {
 		ps.println("1 Serveur FTP Personnel.");
 		ps.println("0 Authentification : ");
 		
-		String commande = "";
+		String commande;
 		
 		// Attente de reception de commandes et leur execution
 		while(!(commande=br.readLine()).equals("bye")) {
