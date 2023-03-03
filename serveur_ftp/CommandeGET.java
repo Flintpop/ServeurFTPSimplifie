@@ -7,7 +7,7 @@ public class CommandeGET extends Commande {
 	}
 
 	public void execute() {
-		ps.println("La commande get n'est pas encoré implémentée");
+
 	}
 
 }
