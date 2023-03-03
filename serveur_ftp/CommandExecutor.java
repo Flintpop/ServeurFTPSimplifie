@@ -10,7 +10,7 @@ public class CommandExecutor {
 			// Changer de repertoire. Un (..) permet de revenir au repertoire superieur
 			if(commande.split(" ")[0].equals("cd")) (new CommandeCD(ps, commande)).execute();
 	
-			// Telecharger un fichier
+			// Télécharger un fichier
 			if(commande.split(" ")[0].equals("get")) (new CommandeGET(ps, commande)).execute();
 			
 			// Afficher la liste des fichiers et des dossiers du repertoire courant
