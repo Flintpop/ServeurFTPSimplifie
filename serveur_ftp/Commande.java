@@ -12,7 +12,7 @@ public abstract class Commande {
         commandeNom = args[0];
         commandeArgs = new String[args.length - 1];
 
-		System.arraycopy(args, 1, commandeArgs, 0, commandeArgs.length);
+        System.arraycopy(args, 1, commandeArgs, 0, commandeArgs.length);
     }
 
     public abstract void execute();

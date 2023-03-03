@@ -16,19 +16,19 @@ public class Main {
 		Socket socket = serveurFTP.accept();
 		
 		BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		PrintStream ps = new PrintStream(socket.getOutputStream());
+		PrintStream sendClient = new PrintStream(socket.getOutputStream());
 		
-		ps.println("1 Bienvenue ! ");
-		ps.println("1 Serveur FTP Personnel.");
-		ps.println("0 Authentification : ");
+		sendClient.println("1 Bienvenue ! ");
+		sendClient.println("1 Serveur FTP Personnel.");
+		sendClient.println("0 Authentification : ");
 		
 		String commande;
 
 		// Attente de reception de commandes et leur execution
 		while(!(commande=br.readLine()).equals("bye")) {
 			System.out.println(">> "+commande);
-			ps.println("1 Vous avez exécute la commande : " + commande);
-			CommandExecutor.executeCommande(ps, commande);
+			sendClient.println("1 Vous avez exécute la commande : " + commande);
+			CommandExecutor.executeCommande(sendClient, commande);
 		}
 		
 		serveurFTP.close();
@@ -40,15 +40,14 @@ public class Main {
 		// [login][password]
 		// Get them via file saving and loading.
 		// Encrypt them if asked
-		String filename = "login.txt";
+//		String filename = "login.txt";
 
-		try {
-			FileInputStream fis = new FileInputStream(filename);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+//		try {
+//			FileInputStream fis = new FileInputStream(filename);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
 
 		return new String[1][1];
 	}
-
 }
