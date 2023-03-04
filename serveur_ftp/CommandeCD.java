@@ -8,7 +8,8 @@ public class CommandeCD extends Commande {
     public void execute() {
         try {
             if (commandeArgs[0].equals("..")) {
-                if (CommandExecutor.currentPath.equals(CommandExecutor.rootPath + CommandExecutor.currentUser + "\\")) {
+                String path = CommandExecutor.addPath(CommandExecutor.rootPath, CommandExecutor.currentUser);
+                if (CommandExecutor.currentPath.equals(path)) {
                     ps.println("2 Vous êtes déjà à la racine de votre espace");
                     return;
                 }
@@ -21,7 +22,7 @@ public class CommandeCD extends Commande {
 
             String dir = findSubDirectory(commandeArgs[0]);
             if (!dir.equals("")) {
-                CommandExecutor.addPath(CommandExecutor.currentPath, dir);
+                CommandExecutor.currentPath = CommandExecutor.addPath(CommandExecutor.currentPath, dir);
                 ps.println("0 Nouveau chemin : " + CommandExecutor.currentPath);
                 return;
             }

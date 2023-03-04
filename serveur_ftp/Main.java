@@ -34,27 +34,4 @@ public class Main {
 		serveurFTP.close();
 		socket.close();
 	}
-
-	// Function to get all login and password from a file
-	public static String [][] getAllLogin() {
-		// [login][password]
-		// Get them via file saving and loading.
-		// Encrypt them if asked
-//		String filename = "login.txt";
-
-//		try {
-//			FileInputStream fis = new FileInputStream(filename);
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-
-		return new String[1][1];
-	}
-
-	public static void printClientCommandLineDecoration(PrintStream sendClient) {
-		if (CommandExecutor.userOk && CommandExecutor.pwOk) {
-			sendClient.println("-1");
-			sendClient.println(CommandExecutor.currentUser + " >> ");
-		}
-	}
 }
