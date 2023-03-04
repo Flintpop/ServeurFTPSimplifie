@@ -7,7 +7,7 @@ public class CommandExecutor {
     public static boolean pwOk = false;
 
     static File file = new File(".");
-    static String rootPath = addPath(file.getAbsoluteFile().toString().replace(".", ""), "serveur_ftp/root");
+    static String rootPath = addPath(file.getAbsoluteFile().toString().replace(".", ""), "root");
     static String currentPath = rootPath;
 
     static String currentUser;
@@ -44,8 +44,9 @@ public class CommandExecutor {
                 (new CommandeMKDIR(ps, commande)).execute();
             }
 
+            // Supprimer un dossier vide
             if (commande.split(" ")[0].equals("rmdir")) {
-                (new CommandeCD(ps, commande)).execute();
+                (new CommandeRMDIR(ps, commande)).execute();
             }
         } else {
             if (commande.split(" ")[0].equals("pass") || commande.split(" ")[0].equals("user")) {
@@ -64,6 +65,12 @@ public class CommandExecutor {
     }
 
     public static String addPath(String path, String add) {
-        return path + add;
+        String OS = System.getProperty("os.name").toLowerCase();
+
+        if (OS.contains("win")) {
+            return path + add + "\\";
+        } else {
+            return path + add + "/";
+        }
     }
 }

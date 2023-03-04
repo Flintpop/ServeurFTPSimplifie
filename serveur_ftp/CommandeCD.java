@@ -21,7 +21,7 @@ public class CommandeCD extends Commande {
 
             String dir = findSubDirectory(commandeArgs[0]);
             if (!dir.equals("")) {
-                CommandExecutor.currentPath = CommandExecutor.currentPath + dir + "\\";
+                CommandExecutor.addPath(CommandExecutor.currentPath, dir);
                 ps.println("0 Nouveau chemin : " + CommandExecutor.currentPath);
                 return;
             }
@@ -35,8 +35,16 @@ public class CommandeCD extends Commande {
     }
 
     public void goBackOneDirectory() {
-        CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
-        CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
-        CommandExecutor.currentPath = CommandExecutor.currentPath + "\\";
+        String OS = System.getProperty("os.name").toLowerCase();
+        if (OS.contains("win")) {
+            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
+            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
+            CommandExecutor.currentPath = CommandExecutor.currentPath + "\\";
+        }
+        else {
+            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("/"));
+            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("/"));
+            CommandExecutor.currentPath = CommandExecutor.currentPath + "/";
+        }
     }
 }
