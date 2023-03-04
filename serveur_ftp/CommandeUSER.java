@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CommandeUSER extends Commande {
 
@@ -16,7 +17,7 @@ public class CommandeUSER extends Commande {
             File[] files = directory.listFiles();
             List<String> list = new ArrayList<>();
             //on récupère les noms des répertoires dans une liste
-            for (File f : files) {
+            for (File f : Objects.requireNonNull(files)) {
                 if (f.isDirectory()) {
                     list.add(f.getName());
                 }
@@ -32,7 +33,7 @@ public class CommandeUSER extends Commande {
             }
             ps.println("2 Le user " + commandeArgs[0] + " n'existe pas");
         } else {
-            ps.println("2 Le dossier root n'existe pas" + directory.getAbsolutePath());
+            ps.println("2 Le dossier root n'existe pas " + directory.getAbsolutePath());
         }
     }
 
