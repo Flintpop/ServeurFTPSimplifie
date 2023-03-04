@@ -50,4 +50,11 @@ public class Main {
 
 		return new String[1][1];
 	}
+
+	public static void printClientCommandLineDecoration(PrintStream sendClient) {
+		if (CommandExecutor.userOk && CommandExecutor.pwOk) {
+			sendClient.println("-1");
+			sendClient.println(CommandExecutor.currentUser + " >> ");
+		}
+	}
 }

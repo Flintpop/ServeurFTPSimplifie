@@ -4,21 +4,23 @@ import java.net.Socket;
 public class client {
     public static void main(String[] args) {
         // create a socket with server IP and port
-        BufferedReader input;
-        PrintWriter output;
+        BufferedReader server;
+        PrintWriter sendServer;
 
         try (Socket socket = new Socket("localhost", 2001)) {
             // get input and output streams
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            output = new PrintWriter(socket.getOutputStream(), true);
+            server = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            sendServer = new PrintWriter(socket.getOutputStream(), true);
             String commande;
 
-            // Boucle principale
-            getWelcomeMessage(input);
+            getWelcomeMessage(server);
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+            // Boucle principale
+            sendUserData(sendServer, server);
             while (!(commande = reader.readLine()).equals("bye")) {
-                output.println(commande);
-                printsMessagesFromServer(input);
+                sendServer.println(commande);
+                printsMessagesFromServer(server);
             }
 
         } catch (IOException e) {
@@ -41,6 +43,8 @@ public class client {
         }
 
         if (message.charAt(0) != '0' && message.charAt(0) != '1' && message.charAt(0) != '2') {
+            System.err.println("Message : ");
+            System.err.println(message);
             throw new RuntimeException("Message from server is not valid");
         }
 
@@ -67,23 +71,21 @@ public class client {
         }
     }
 
-    public static void sendUserData(PrintWriter sendServer) {
-        String user;
-        String password;
-
-        try {
-            System.out.println("User : ");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            user = reader.readLine();
-            System.out.println("Password : ");
-            password = reader.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Fonction de debug pour skip la partie connection.
+     *
+     * @param sendServer Utilisé pour envoyer des données au serveur sftp
+     * @param server     Utilisé pour afficher les messages de réponse du serveur sftp
+     */
+    public static void sendUserData(PrintWriter sendServer, BufferedReader server) {
+        String user = "user breton";
+        String password = "pass bretons";
 
         // Send data to server
         sendServer.println(user);
+        printsMessagesFromServer(server);
         sendServer.println(password);
+        printsMessagesFromServer(server);
 
     }
 }

@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.PrintStream;
 
 public abstract class Commande {
@@ -16,5 +17,19 @@ public abstract class Commande {
     }
 
     public abstract void execute();
+
+    public String findSubDirectory(String dir) {
+        // On veut aller dans un subdirectory
+        File file = new File(CommandExecutor.currentPath);
+        String[] directories = file.list((current, name) -> new File(current, name).isDirectory());
+        if (directories != null) {
+            for (String directory : directories) {
+                if (dir.equals(directory)) {
+                    return directory;
+                }
+            }
+        }
+        return "";
+    }
 
 }

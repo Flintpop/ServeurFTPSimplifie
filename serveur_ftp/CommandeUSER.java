@@ -8,7 +8,7 @@ public class CommandeUSER extends Commande {
 
     public void execute() {
         // Ce serveur accepte uniquement l'user personne
-        if (commandeArgs[0].equalsIgnoreCase("personne")) {
+        if (commandeArgs[0].equalsIgnoreCase("breton")) {
             CommandExecutor.userOk = true;
             CommandExecutor.currentUser = commandeArgs[0];
             ps.println("0 Commande user OK");
