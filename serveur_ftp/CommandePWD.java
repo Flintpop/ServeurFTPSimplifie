@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.PrintStream;
 
 public class CommandePWD extends Commande {
@@ -8,9 +10,17 @@ public class CommandePWD extends Commande {
 	}
 
 	public void execute() {
-		File file = new File(".");
-		String s = file.getAbsoluteFile().toString();
-		ps.println("0 " + s);
+
+		/*String s;
+		try{
+			BufferedReader br = new BufferedReader(new FileReader("pwd.txt"));
+			s = br.readLine();
+			ps.println("0 " + s);
+		}catch (Exception e){
+			e.printStackTrace();
+		}*/
+
+		ps.println("0 " + CommandExecutor.currentPath);
 	}
 
 }
