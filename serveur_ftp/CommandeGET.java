@@ -1,4 +1,5 @@
 import java.io.*;
+import java.sql.ClientInfoStatus;
 
 public class CommandeGET extends Commande {
 	
@@ -10,7 +11,7 @@ public class CommandeGET extends Commande {
 		try{
 			File file = new File(commandeArgs[0]);
 			String src = file.getAbsolutePath();
-			String dest = super.commandeArgs[1];
+			String dest = src + "/../" + "Client/";
 			FileInputStream fis = new FileInputStream(src);
 			FileOutputStream fos = new FileOutputStream(dest);
 			byte[] buffer = new byte[4096];
