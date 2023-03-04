@@ -7,10 +7,12 @@ public class client {
     public static void main(String[] args) {
         BufferedReader server;
         PrintWriter sendServer;
+        Socket socket = null;
 
-        Socket socket = connectToServer();
 
         try {
+            socket = connectToServer(2000);
+
             server = new BufferedReader(new InputStreamReader(Objects.requireNonNull(socket).getInputStream()));
             sendServer = new PrintWriter(socket.getOutputStream(), true);
             String commande;
@@ -27,15 +29,26 @@ public class client {
                 if (commande.startsWith("stor")) {
                     sendFile(commande.substring(5));
                 }
+                if (commande.startsWith("bye")) {
+                    System.out.println("Connection closed");
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        try {
             socket.close();
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            System.err.println("Erreur le serveur s'est brusquement arrêté");
+
+            // Fermer le socket proprement
+            try {
+                Objects.requireNonNull(socket).close();
+            } catch (IOException ex) {
+                System.err.println("Erreur lors de la fermeture du socket");
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -46,7 +59,7 @@ public class client {
             InputStream file;
             OutputStream sendFile;
 
-            Socket socketFile = connectToServer();
+            Socket socketFile = connectToServer(4000);
 
             try {
                 file = new FileInputStream(fileName);
@@ -72,21 +85,21 @@ public class client {
     }
 
 
-    public static Socket connectToServer() {
+    public static Socket connectToServer(int port) {
         Socket socket;
         int attempts = 0;
         while (attempts < 10) {
-            socket = connectToServerTry();
+            socket = connectToServerTry(port);
             if (socket != null) return socket;
             attempts++;
         }
         throw new RuntimeException("Connection failed");
     }
 
-    public static Socket connectToServerTry() {
+    public static Socket connectToServerTry(int port) {
         Socket socket;
         try {
-            socket = new Socket("localhost", 4000);
+            socket = new Socket("localhost", port);
             System.out.println("Connection successful");
             return socket;
         } catch (ConnectException e) {
@@ -139,12 +152,14 @@ public class client {
      */
     public static void printsMessagesFromServer(BufferedReader server) {
         String message = getMessageFromServer(server);
+        char messageContinue = '1';
+        char messageErrorEnd = '2';
 
-        while (message.charAt(0) == '1') {
+        while (message.charAt(0) == messageContinue) {
             System.out.println(message);
             message = getMessageFromServer(server);
         }
-        if (message.charAt(0) == '2') {
+        if (message.charAt(0) == messageErrorEnd) {
             System.err.println(message);
         } else {
             System.out.println(message);
@@ -166,6 +181,5 @@ public class client {
         printsMessagesFromServer(server);
         sendServer.println(password);
         printsMessagesFromServer(server);
-
     }
 }
