@@ -78,8 +78,8 @@ public class client {
      * @param server     Utilisé pour afficher les messages de réponse du serveur sftp
      */
     public static void sendUserData(PrintWriter sendServer, BufferedReader server) {
-        String user = "user breton";
-        String password = "pass bretons";
+        String user = "user abdelaziz";
+        String password = "pass abdoul";
 
         // Send data to server
         sendServer.println(user);

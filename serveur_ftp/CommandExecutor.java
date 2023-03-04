@@ -7,7 +7,7 @@ public class CommandExecutor {
     public static boolean pwOk = false;
 
     static File file = new File(".");
-    static String rootPath = addPath(file.getAbsoluteFile().toString().replace(".", ""), "root");
+    static String rootPath = addPath(file.getAbsoluteFile().toString().replace(".", ""), "serveur_ftp/root");
     static String currentPath = rootPath;
 
     static String currentUser;
@@ -64,6 +64,6 @@ public class CommandExecutor {
     }
 
     public static String addPath(String path, String add) {
-        return path + add + "\\";
+        return path + add;
     }
 }
