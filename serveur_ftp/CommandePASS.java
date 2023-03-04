@@ -22,7 +22,7 @@ public class CommandePASS extends Commande {
 		CommandExecutor.pwOk = true;
 		ps.println("1 Commande pass OK");
 		ps.println("0 " + CommandExecutor.currentUser + " est connecté sur notre serveur");
-		CommandExecutor.currentPath = CommandExecutor.currentPath + CommandExecutor.currentUser + "\\";
+		CommandExecutor.addPath(CommandExecutor.currentPath, CommandExecutor.currentUser);
 	}
 
 }

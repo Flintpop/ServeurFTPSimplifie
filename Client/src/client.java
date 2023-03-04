@@ -21,11 +21,30 @@ public class client {
             while (!(commande = reader.readLine()).equals("bye")) {
                 sendServer.println(commande);
                 printsMessagesFromServer(server);
+                if (commande.startsWith("stor")) {
+                    sendFile(sendServer, server, commande.substring(5));
+                }
             }
 
         } catch (IOException e) {
             System.err.println("Error while connecting to server");
             System.err.println(e.getMessage());
+        }
+    }
+
+    private static void sendFile(PrintWriter sendServer, BufferedReader server, String fileName) {
+        try {
+            try (Socket socketFile = new Socket("localhost", 4000)) {
+                BufferedReader file = new BufferedReader(new FileReader(fileName));
+                PrintWriter sendFile = new PrintWriter(socketFile.getOutputStream(), true);
+                String line;
+                while ((line = file.readLine()) != null) {
+                    sendFile.println(line);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la création du socket pour la transmission des données");
+            throw new RuntimeException(e);
         }
     }
 
@@ -57,8 +76,7 @@ public class client {
      * @param server BufferedReader object to read from serve
      */
     public static void printsMessagesFromServer(BufferedReader server) {
-        String message;
-        message = getMessageFromServer(server);
+        String message = getMessageFromServer(server);
 
         while (message.charAt(0) == '1') {
             System.out.println(message);
