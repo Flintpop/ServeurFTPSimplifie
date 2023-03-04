@@ -12,8 +12,8 @@ public class CommandePASS extends Commande {
 			CommandExecutor.currentUser = "";
 			return;
 		}
-		String path = CommandExecutor.addPath(CommandExecutor.rootPath, CommandExecutor.currentUser);
-		path = CommandExecutor.addPath(path, "pw.txt");
+		CommandExecutor.currentPath = CommandExecutor.addPath(CommandExecutor.rootPath, CommandExecutor.currentUser);
+		String path = CommandExecutor.addPath(CommandExecutor.currentPath, "pw.txt");
 		File file = new File(path);
 		String pass = file.getAbsolutePath();
 		try {
