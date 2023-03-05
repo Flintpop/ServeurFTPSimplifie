@@ -74,4 +74,11 @@ public class CommandExecutor {
             return path + add + "/";
         }
     }
+
+    public static void reset() {
+        userOk = false;
+        pwOk = false;
+        currentPath = rootPath;
+        currentUser = "";
+    }
 }
