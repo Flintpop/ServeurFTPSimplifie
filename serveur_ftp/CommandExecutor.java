@@ -7,7 +7,7 @@ public class CommandExecutor {
     public static boolean pwOk = false;
 
     static File file = new File(".");
-    static String pathToAdd = addPath("serveur_ftp\\", "root");
+    static String pathToAdd = addPath("serveur_ftp/", "root");
     static String rootPath = addPath(file.getAbsoluteFile().toString().replace(".", ""), pathToAdd).replace("\\\\", "\\");
     static String currentPath = rootPath;
 

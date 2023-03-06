@@ -29,6 +29,9 @@ public class client {
                 if (commande.startsWith("stor")) {
                     sendFile(commande.substring(5));
                 }
+                if (commande.startsWith("get")) {
+                    getFile(commande.substring(4));
+                }
                 if (commande.startsWith("bye")) {
                     System.out.println("Connection closed");
                 }
@@ -51,6 +54,36 @@ public class client {
             }
         }
     }
+
+    private static void getFile(String fileName) {
+
+        try (Socket socketFile = connectToServer(4000)) {
+
+            File directory = new File(fileName);
+            if(directory.mkdirs()){
+                System.out.println("Le dossier a été créé");
+            }else{
+                System.out.println("Le dossier existe déjà");
+            }
+            InputStream is = socketFile.getInputStream();
+            OutputStream fos = new FileOutputStream(directory +"/" + fileName);
+
+            byte[] buffer = new byte[1024];
+            int nbOctetsLus;
+            while((nbOctetsLus = is.read(buffer)) > 0){
+                fos.write(buffer, 0, nbOctetsLus);
+                System.out.println("1 " + nbOctetsLus + " octets envoyés");
+            }
+
+            fos.close();
+            is.close();
+
+        }catch (Exception e){
+            System.err.println("Erreur lors de la création du socket pour la transmission des données");
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private static void sendFile(String fileName) {
         try {
