@@ -4,14 +4,14 @@ import java.nio.file.Paths;
 
 public class CommandeLS extends Commande {
 	
-	public CommandeLS(PrintStream ps, String commandeStr) {
-		super(ps, commandeStr);
+	public CommandeLS(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+		super(ps, commandeStr, commandExecutor);
 	}
 
 
 	public void execute() {
 		try {
-			Path path = Paths.get(CommandExecutor.currentPath);
+			Path path = Paths.get(commandExecutor.currentPath);
 			java.nio.file.Files.list(path).forEach((p) -> ps.println("1 " + p.getFileName()));
 			ps.println("0 Fin de la liste");
 		} catch (Exception e) {

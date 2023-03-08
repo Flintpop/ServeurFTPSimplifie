@@ -8,6 +8,8 @@ public class CommandeRMDIR extends Commande {
     }
 
     public void execute() {
+        //TODO: Bug avec rmdir le dossier est vide mais il ne l'est pas (fraichement créé avec mkdir)
+
         // Check si l'argument est valide
         if (commandeArgs[0].equals("")) {
             ps.println("2 Erreur, pas de paramètre dans la commande rmdir");

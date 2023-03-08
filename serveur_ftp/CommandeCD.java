@@ -1,26 +1,26 @@
 import java.io.PrintStream;
 
 public class CommandeCD extends Commande {
-    public CommandeCD(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeCD(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
         try {
             if (commandeArgs[0].equals("..")) {
-                String path = CommandExecutor.addPath(CommandExecutor.rootPath, CommandExecutor.currentUser);
-                if (CommandExecutor.currentPath.equals(path)) {
+                String path = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
+                if (commandExecutor.currentPath.equals(path)) {
                     ps.println("2 Vous êtes déjà à la racine de votre espace");
                     return;
                 }
 
-                goBackOneDirectory();
+                commandExecutor.goBackOneDirectory();
 
-                ps.println("0 Nouveau chemin : " + CommandExecutor.currentPath);
+                ps.println("0 Nouveau chemin : " + commandExecutor.currentPath);
                 return;
             }
 
-            String dir = findSubDirectory(commandeArgs[0]);
+            String dir = commandExecutor.findSubDirectory(commandeArgs[0]);
             if (!dir.equals("")) {
                 commandExecutor.currentPath = CommandExecutor.addPath(commandExecutor.currentPath, dir);
                 ps.println("0 Nouveau chemin : " + commandExecutor.currentPath);
@@ -35,17 +35,4 @@ public class CommandeCD extends Commande {
         }
     }
 
-    public void goBackOneDirectory() {
-        String OS = System.getProperty("os.name").toLowerCase();
-        if (OS.contains("win")) {
-            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
-            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("\\"));
-            CommandExecutor.currentPath = CommandExecutor.currentPath + "\\";
-        }
-        else {
-            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("/"));
-            CommandExecutor.currentPath = CommandExecutor.currentPath.substring(0, CommandExecutor.currentPath.lastIndexOf("/"));
-            CommandExecutor.currentPath = CommandExecutor.currentPath + "/";
-        }
-    }
 }

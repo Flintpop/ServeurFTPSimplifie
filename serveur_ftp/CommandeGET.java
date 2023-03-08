@@ -6,8 +6,8 @@ import java.sql.ClientInfoStatus;
 
 public class CommandeGET extends Commande {
 
-    public CommandeGET(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeGET(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
@@ -17,7 +17,7 @@ public class CommandeGET extends Commande {
             Socket socketCli = socketTransfer.accept();
 
             OutputStream out = socketCli.getOutputStream();
-            InputStream fis = new FileInputStream(CommandExecutor.addPath(CommandExecutor.currentPath, commandeArgs[0]));
+            InputStream fis = new FileInputStream(CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]));
             byte[] buffer = new byte[1024];
             int nbOctetsLus;
             int somOctetsEnvoye = 0;

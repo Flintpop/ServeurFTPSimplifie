@@ -20,7 +20,7 @@ public class CommandePWD extends Commande {
 			e.printStackTrace();
 		}*/
 
-		ps.println("0 " + CommandExecutor.currentPath);
+		ps.println("0 " + commandExecutor.currentPath);
 	}
 
 }

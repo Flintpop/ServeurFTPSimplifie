@@ -4,13 +4,13 @@ import java.net.Socket;
 
 public class CommandeSTOR extends Commande {
 
-    public CommandeSTOR(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeSTOR(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
-        String filepath = CommandExecutor.addPath(CommandExecutor.currentPath, commandeArgs[0]);
+        String filepath = CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]);
 
         try (ServerSocket dataSocket = new ServerSocket(4000)) {// créer une socket serveur sur le port 4000
             Socket socket = dataSocket.accept(); // attendre la connexion d'un client
