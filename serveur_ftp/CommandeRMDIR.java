@@ -3,8 +3,8 @@ import java.io.PrintStream;
 
 public class CommandeRMDIR extends Commande {
 
-    public CommandeRMDIR(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeRMDIR(PrintStream ps, String commandeStr,CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
@@ -14,14 +14,14 @@ public class CommandeRMDIR extends Commande {
             return;
         }
 
-        String res = findSubDirectory(commandeArgs[0]);
+        String res = commandExecutor.findSubDirectory(commandeArgs[0]);
         if (res.equals("")) {
             ps.println("2 '" + commandeArgs[0] + "' n'existe pas dans le répertoire courant");
             return;
         }
 
         // Vérifier si le dossier n'est pas vide
-        File directory = new File(CommandExecutor.addPath(CommandExecutor.currentPath, res));
+        File directory = new File(CommandExecutor.addPath(commandExecutor.currentPath, res));
         if (directory.isDirectory()) {
             if (directory.length() > 0) {
                 ps.println("2 Le dossier '" + res + "' n'est pas vide");

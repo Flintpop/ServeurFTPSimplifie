@@ -6,13 +6,13 @@ import java.util.Objects;
 
 public class CommandeUSER extends Commande {
 
-    public CommandeUSER(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeUSER(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
         //on récupère le nom du dossier root
-        File directory = new File(CommandExecutor.rootPath);
+        File directory = new File(commandExecutor.rootPath);
         if(directory.exists() && directory.isDirectory()){
             File[] files = directory.listFiles();
             List<String> list = new ArrayList<>();
@@ -25,8 +25,8 @@ public class CommandeUSER extends Commande {
             //on compare la liste des répertoire avec le nom du user
             for (String s : list) {
                 if(s.equals(commandeArgs[0])){
-                    CommandExecutor.userOk = true;
-                    CommandExecutor.currentUser = commandeArgs[0];
+                    commandExecutor.userOk = true;
+                    commandExecutor.currentUser = commandeArgs[0];
                     ps.println("0 Commande user OK");
                     return;
                 }

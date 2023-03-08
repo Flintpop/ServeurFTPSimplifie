@@ -22,7 +22,7 @@ public class client {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             // Boucle principale
-            sendUserData(sendServer, server);
+            //sendUserData(sendServer, server);
 
             while (!(commande = reader.readLine()).equals("bye")) {
                 sendServer.println(commande);
@@ -70,7 +70,7 @@ public class client {
             }
 
             InputStream is = socketFile.getInputStream();
-            OutputStream fos = new FileOutputStream(directory.getName() + "\\" + fileName);
+            OutputStream fos = new FileOutputStream(directory.getName() + "/" + fileName);
 
             byte[] buffer = new byte[1024];
             int nbOctetsLus;

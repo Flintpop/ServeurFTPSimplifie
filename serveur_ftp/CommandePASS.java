@@ -2,18 +2,18 @@ import java.io.*;
 
 public class CommandePASS extends Commande {
 	
-	public CommandePASS(PrintStream ps, String commandeStr) {
-		super(ps, commandeStr);
+	public CommandePASS(PrintStream ps, String commandeStr,CommandExecutor commandExecutor) {
+		super(ps, commandeStr,commandExecutor);
 	}
 
 	public void execute() {
-		if (!CommandExecutor.userOk) {
+		if (!commandExecutor.userOk) {
 			ps.println("2 Il faut d'abord renseigner l'user");
-			CommandExecutor.currentUser = "";
+			commandExecutor.currentUser = "";
 			return;
 		}
-		CommandExecutor.currentPath = CommandExecutor.addPath(CommandExecutor.rootPath, CommandExecutor.currentUser);
-		String path = CommandExecutor.addPath(CommandExecutor.currentPath, "pw.txt");
+		commandExecutor.currentPath = commandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
+		String path = commandExecutor.addPath(commandExecutor.currentPath, "pw.txt");
 		File file = new File(path);
 		String pass = file.getAbsolutePath();
 		try {
@@ -22,7 +22,7 @@ public class CommandePASS extends Commande {
 				if (str != null) {
 					if (!commandeArgs[0].equals(str)) {
 						ps.println("2 Le mot de passe est faux");
-						CommandExecutor.currentUser = "";
+						commandExecutor.currentUser = "";
 						return;
 					}
 				} else {
@@ -34,10 +34,10 @@ public class CommandePASS extends Commande {
 			e.printStackTrace();
 		}
 
-		CommandExecutor.pwOk = true;
+		commandExecutor.pwOk = true;
 		ps.println("1 Commande pass OK");
-		ps.println("0 " + CommandExecutor.currentUser + " est connecté sur notre serveur");
-		CommandExecutor.addPath(CommandExecutor.currentPath, CommandExecutor.currentUser);
+		ps.println("0 " + commandExecutor.currentUser + " est connecté sur notre serveur");
+		commandExecutor.addPath(commandExecutor.currentPath, commandExecutor.currentUser);
 	}
 
 }

@@ -5,8 +5,8 @@ import java.io.PrintStream;
 
 public class CommandePWD extends Commande {
 	
-	public CommandePWD(PrintStream ps, String commandeStr) {
-		super(ps, commandeStr);
+	public CommandePWD(PrintStream ps, String commandeStr,CommandExecutor commandExecutor) {
+		super(ps, commandeStr, commandExecutor);
 	}
 
 	public void execute() {

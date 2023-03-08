@@ -3,12 +3,12 @@ import java.io.PrintStream;
 
 public class CommandeMKDIR extends Commande{
 
-    public CommandeMKDIR(PrintStream ps, String commandeStr) {
-        super(ps, commandeStr);
+    public CommandeMKDIR(PrintStream ps, String commandeStr, CommandExecutor commandExecutor) {
+        super(ps, commandeStr, commandExecutor);
     }
 
     public void execute() {
-        File directory = new File(CommandExecutor.currentPath + "/" + commandeArgs[0]);
+        File directory = new File(commandExecutor.currentPath + "/" + commandeArgs[0]);
         if (!directory.exists()) {
             if(directory.mkdir()){
                 ps.println("0 Le dossier a été créé");

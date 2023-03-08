@@ -22,8 +22,8 @@ public class CommandeCD extends Commande {
 
             String dir = findSubDirectory(commandeArgs[0]);
             if (!dir.equals("")) {
-                CommandExecutor.currentPath = CommandExecutor.addPath(CommandExecutor.currentPath, dir);
-                ps.println("0 Nouveau chemin : " + CommandExecutor.currentPath);
+                commandExecutor.currentPath = CommandExecutor.addPath(commandExecutor.currentPath, dir);
+                ps.println("0 Nouveau chemin : " + commandExecutor.currentPath);
                 return;
             }
 
