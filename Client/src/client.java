@@ -33,7 +33,7 @@ public class client {
                 }
 
                 if (commande.startsWith("get")) {
-                    getFile(commande.substring(4));
+                    getFile(commande.substring(4), server);
                 }
 
                 if (commande.startsWith("bye")) {
@@ -59,7 +59,7 @@ public class client {
         }
     }
 
-    private static void getFile(String fileName) {
+    private static void getFile(String fileName, BufferedReader server) {
 
         try (Socket socketFile = connectToServer(4000)) {
 
@@ -80,6 +80,7 @@ public class client {
             }
 
             System.out.println("Transfert terminé");
+            printsMessagesFromServer(server);
             fos.close();
             is.close();
 

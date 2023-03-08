@@ -11,7 +11,7 @@ public class CommandeGET extends Commande {
     }
 
     public void execute() {
-        ps.println("1 Nouveau socket sur le port 4000 est créé pour la transmission des données");
+        ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
 
         try (ServerSocket socketTransfer = new ServerSocket(4000)) {
             Socket socketCli = socketTransfer.accept();
