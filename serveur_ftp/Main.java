@@ -39,6 +39,8 @@ public class Main {
             } catch (Exception e) {
                 System.err.println("Erreur : " + e.getMessage());
                 System.err.println("Le client s'est déconnecté.");
+                System.err.println("Traceback : ");
+                e.printStackTrace();
                 socket.close();
                 CommandExecutor.reset();
             }

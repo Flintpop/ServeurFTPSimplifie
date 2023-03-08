@@ -1,3 +1,4 @@
+import javax.xml.stream.events.Comment;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -26,12 +27,15 @@ public class client {
             while (!(commande = reader.readLine()).equals("bye")) {
                 sendServer.println(commande);
                 printsMessagesFromServer(server);
+
                 if (commande.startsWith("stor")) {
                     sendFile(commande.substring(5));
                 }
+
                 if (commande.startsWith("get")) {
                     getFile(commande.substring(4));
                 }
+
                 if (commande.startsWith("bye")) {
                     System.out.println("Connection closed");
                 }
@@ -59,27 +63,30 @@ public class client {
 
         try (Socket socketFile = connectToServer(4000)) {
 
-            File directory = new File(fileName);
-            if(directory.mkdirs()){
-                System.out.println("Le dossier a été créé");
-            }else{
-                System.out.println("Le dossier existe déjà");
+            File directory = new File("Download");
+
+            if (directory.mkdirs()) {
+                System.out.println("Un dossier de téléchargement a été créé");
             }
+
             InputStream is = socketFile.getInputStream();
-            OutputStream fos = new FileOutputStream(directory +"/" + fileName);
+            OutputStream fos = new FileOutputStream(directory.getName() + "\\" + fileName);
 
             byte[] buffer = new byte[1024];
             int nbOctetsLus;
-            while((nbOctetsLus = is.read(buffer)) > 0){
+
+            while ((nbOctetsLus = is.read(buffer)) > 0) {
                 fos.write(buffer, 0, nbOctetsLus);
-                System.out.println("1 " + nbOctetsLus + " octets envoyés");
             }
 
+            System.out.println("Transfert terminé");
             fos.close();
             is.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Erreur lors de la création du socket pour la transmission des données");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -157,6 +164,7 @@ public class client {
 
     /**
      * Reçoit un message du serveur et vérifie qu'il est valide.
+     *
      * @param server BufferedReader utilisé pour lire les messages du serveur
      * @return Le message du serveur
      */
