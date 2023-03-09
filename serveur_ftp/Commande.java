@@ -20,4 +20,11 @@ public abstract class Commande {
 
     public abstract void execute();
 
+    public boolean incorrectParameters(int nParameter) {
+        if (commandeArgs.length == nParameter) {
+            return false;
+        }
+        ps.println("2 Erreur, nombre de paramètres incorrects");
+        return true;
+    }
 }

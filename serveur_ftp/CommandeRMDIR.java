@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Objects;
 
 public class CommandeRMDIR extends Commande {
 
@@ -25,10 +26,13 @@ public class CommandeRMDIR extends Commande {
         // Vérifier si le dossier n'est pas vide
         File directory = new File(CommandExecutor.addPath(commandExecutor.currentPath, res));
         if (directory.isDirectory()) {
-            if (directory.length() > 0) {
-                ps.println("2 Le dossier '" + res + "' n'est pas vide");
+            if (Objects.requireNonNull(directory.listFiles()).length > 0) {
+                ps.println("2 Le dossier '" + directory.length() + "' n'est pas vide");
                 return;
             }
+        }
+        else {
+            ps.println("2 C'est un fichier et non un dossier. Impossible de le supprimer.");
         }
 
         // C'est bon

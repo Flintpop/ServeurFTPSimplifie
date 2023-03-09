@@ -6,7 +6,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 public class Main implements Runnable {
 
     private Socket socket;
@@ -32,6 +31,7 @@ public class Main implements Runnable {
         CommandExecutor commandExecutor = new CommandExecutor();
         try {
 
+            System.out.println("Nouveau client connecté : " + socket.getInetAddress());
             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream sendClient = new PrintStream(socket.getOutputStream());
 

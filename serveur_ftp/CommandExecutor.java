@@ -85,7 +85,7 @@ public class CommandExecutor {
 
         String folderSeparator = getFolderSeperator();
 
-        // Avoir path et add bien formatté afin qu'ils puissent être ajouté entre eux
+        // Avoir path et add bien formatté afin qu'ils puissent être ajoutés entre eux
         boolean formatted = false;
         while (!formatted) {
             if (path.endsWith(folderSeparator)) path = path.substring(0, path.length() - 1);
