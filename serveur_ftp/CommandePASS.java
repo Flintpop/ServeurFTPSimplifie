@@ -7,13 +7,15 @@ public class CommandePASS extends Commande {
 	}
 
 	public void execute() {
+		if (this.incorrectParameters(1)) return;
+
 		if (!commandExecutor.userOk) {
 			ps.println("2 Il faut d'abord renseigner l'user");
 			commandExecutor.currentUser = "";
 			return;
 		}
-		commandExecutor.currentPath = commandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
-		String path = commandExecutor.addPath(commandExecutor.currentPath, "pw.txt");
+		commandExecutor.currentPath = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
+		String path = CommandExecutor.addPath(commandExecutor.currentPath, "pw.txt");
 		File file = new File(path);
 		String pass = file.getAbsolutePath();
 		try {

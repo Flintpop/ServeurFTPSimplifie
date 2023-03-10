@@ -11,6 +11,8 @@ public class CommandeUSER extends Commande {
     }
 
     public void execute() {
+        if (this.incorrectParameters(1)) return;
+
         //on récupère le nom du dossier root
         File directory = new File(commandExecutor.rootPath);
         if(directory.exists() && directory.isDirectory()){

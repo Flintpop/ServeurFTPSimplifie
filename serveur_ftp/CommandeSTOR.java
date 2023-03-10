@@ -9,6 +9,8 @@ public class CommandeSTOR extends Commande {
     }
 
     public void execute() {
+        if (this.incorrectParameters(1)) return;
+
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
         String filepath = CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]);
 

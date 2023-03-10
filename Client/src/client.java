@@ -1,4 +1,3 @@
-import javax.xml.stream.events.Comment;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -9,7 +8,6 @@ public class client {
         BufferedReader server;
         PrintWriter sendServer;
         Socket socket = null;
-
 
         try {
             socket = connectToServer(2000);
@@ -59,7 +57,7 @@ public class client {
         }
     }
 
-    private static void getFile(String fileName, BufferedReader server) {
+    public static void getFile(String fileName, BufferedReader server) {
 
         try (Socket socketFile = connectToServer(4000)) {
 
@@ -93,7 +91,7 @@ public class client {
     }
 
 
-    private static void sendFile(String fileName) {
+    public static void sendFile(String fileName) {
         try {
             int bufferSize = 4096;
 
@@ -223,5 +221,9 @@ public class client {
         printsMessagesFromServer(server);
         sendServer.println(password);
         printsMessagesFromServer(server);
+    }
+
+    public static void IHM() {
+
     }
 }

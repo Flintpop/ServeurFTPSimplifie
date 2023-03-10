@@ -1,8 +1,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
-import java.sql.ClientInfoStatus;
 
 public class CommandeGET extends Commande {
 
@@ -11,6 +9,8 @@ public class CommandeGET extends Commande {
     }
 
     public void execute() {
+        if (this.incorrectParameters(1)) return;
+
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
 
         try (ServerSocket socketTransfer = new ServerSocket(4000)) {

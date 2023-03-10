@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.PrintStream;
 
 public abstract class Commande {

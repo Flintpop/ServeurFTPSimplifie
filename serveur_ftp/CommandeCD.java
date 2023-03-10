@@ -7,6 +7,8 @@ public class CommandeCD extends Commande {
 
     public void execute() {
         try {
+            if (this.incorrectParameters(1)) return;
+
             if (commandeArgs[0].equals("..")) {
                 String path = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
                 if (commandExecutor.currentPath.equals(path)) {

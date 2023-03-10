@@ -9,7 +9,7 @@ public class CommandeRMDIR extends Commande {
     }
 
     public void execute() {
-        //TODO: Bug avec rmdir le dossier est vide mais il ne l'est pas (fraichement créé avec mkdir)
+        if (this.incorrectParameters(1)) return;
 
         // Check si l'argument est valide
         if (commandeArgs[0].equals("")) {
