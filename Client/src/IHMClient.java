@@ -17,6 +17,9 @@ public class IHMClient extends JFrame implements ActionListener {
     BufferedReader server = null;
     PrintWriter sendServer = null;
 
+    JPanel panel2;
+    JPanel panel3;
+
     // Constructeur
     public IHMClient() {
         super("FTP Client");
@@ -39,7 +42,7 @@ public class IHMClient extends JFrame implements ActionListener {
         panel1.add(textFieldPassword);
         panel1.add(buttonConnect);
 
-        JPanel panel2 = new JPanel();
+        panel2 = new JPanel();
         panel2.add(new JScrollPane(fileList));
         panel2.add(buttonDownload);
         panel2.add(buttonUpload);
@@ -70,7 +73,8 @@ public class IHMClient extends JFrame implements ActionListener {
     // Méthode pour se connecter au serveur FTP
     private void connect() {
         try {
-            socket = client.connectToServer(2000);
+            int port = 2000;
+            socket = client.connectToServer(port);
 
             server = new BufferedReader(new InputStreamReader(Objects.requireNonNull(socket).getInputStream()));
             sendServer = new PrintWriter(socket.getOutputStream(), true);
@@ -121,12 +125,22 @@ public class IHMClient extends JFrame implements ActionListener {
     public void sendUserData(PrintWriter sendServer, BufferedReader server) {
         String user = "user " + this.textFieldUsername.getText();
         String password = "pass " + this.textFieldPassword.getText();
+        boolean userConnected;
 
         // Send data to server
         sendServer.println(user);
-        client.printsMessagesFromServer(server);
+        userConnected = client.printsMessagesFromServer(server);
         sendServer.println(password);
-        client.printsMessagesFromServer(server);
+        userConnected = userConnected && client.printsMessagesFromServer(server);
+
+        // S'il s'est connecté. Comment on sait ?
+        if (!userConnected) {
+            JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
+            return;
+        }
+        JOptionPane.showMessageDialog(this, "Connected to FTP server.");
+        getContentPane().add(panel2, "Center");
+        getContentPane().add(panel3, "North");
     }
 
     private class WindowEventHandler extends WindowAdapter {

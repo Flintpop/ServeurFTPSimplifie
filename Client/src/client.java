@@ -135,6 +135,12 @@ public class client {
         throw new RuntimeException("Connection failed");
     }
 
+    /**
+     * Essaie de se connecter au serveur via un socket TCP. Si cela n'est pas possible, la fonction affiche
+     * "Connection failed. Trying again in 1 second"
+     * @param port
+     * @return
+     */
     public static Socket connectToServerTry(int port) {
         Socket socket;
         try {
@@ -190,7 +196,7 @@ public class client {
      *
      * @param server BufferedReader utilisé pour lire les messages du serveur
      */
-    public static void printsMessagesFromServer(BufferedReader server) {
+    public static boolean printsMessagesFromServer(BufferedReader server) {
         String message = getMessageFromServer(server);
         char messageContinue = '1';
         char messageErrorEnd = '2';
@@ -201,8 +207,10 @@ public class client {
         }
         if (message.charAt(0) == messageErrorEnd) {
             System.err.println(message);
+            return false;
         } else {
             System.out.println(message);
+            return true;
         }
     }
 

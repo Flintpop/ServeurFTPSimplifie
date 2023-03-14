@@ -51,17 +51,26 @@ public class Main implements Runnable {
             socket.close();
             commandExecutor.reset();
 
-        } catch (Exception e) {
-            System.err.println("Erreur : " + e.getMessage());
+        } catch (NullPointerException e) {
+            // Client déconnecté normalement
             System.err.println("Le client s'est déconnecté.");
+            closeSocket(commandExecutor);
+
+        } catch (Exception e) {
+            System.err.println("Le client s'est déconnecté.");
+            System.err.println("Erreur : " + e.getMessage());
             System.err.println("Traceback : ");
             e.printStackTrace();
-            try {
-                socket.close();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            commandExecutor.reset();
+            closeSocket(commandExecutor);
         }
+    }
+
+    public void closeSocket(CommandExecutor commandExecutor) {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        commandExecutor.reset();
     }
 }
