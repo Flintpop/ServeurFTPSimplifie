@@ -47,6 +47,7 @@ public class Main implements Runnable {
                 sendClient.println("1 Vous avez exécute la commande : " + commande);
                 commandExecutor.executeCommande(sendClient, commande);
             }
+
             socket.close();
             commandExecutor.reset();
 

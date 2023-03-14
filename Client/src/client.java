@@ -26,17 +26,7 @@ public class client {
                 sendServer.println(commande);
                 printsMessagesFromServer(server);
 
-                if (commande.startsWith("stor")) {
-                    sendFile(commande.substring(5));
-                }
-
-                if (commande.startsWith("get")) {
-                    getFile(commande.substring(4), server);
-                }
-
-                if (commande.startsWith("bye")) {
-                    System.out.println("Connection closed");
-                }
+                manageSpecialsCommands(commande, server);
             }
 
             socket.close();
@@ -44,7 +34,7 @@ public class client {
             e.printStackTrace();
             throw new RuntimeException(e);
         } catch (Exception e) {
-//            e.printStackTrace();
+            // e.printStackTrace();
             System.err.println("Erreur le serveur s'est brusquement arrêté");
 
             // Fermer le socket proprement
@@ -54,6 +44,16 @@ public class client {
                 System.err.println("Erreur lors de la fermeture du socket");
                 throw new RuntimeException(ex);
             }
+        }
+    }
+
+    private static void manageSpecialsCommands(String commande, BufferedReader server) {
+        if (commande.startsWith("stor")) {
+            sendFile(commande.substring(5));
+        } else if (commande.startsWith("get")) {
+            getFile(commande.substring(4), server);
+        } else if (commande.startsWith("bye")) {
+            System.out.println("Connection closed");
         }
     }
 
@@ -221,9 +221,5 @@ public class client {
         printsMessagesFromServer(server);
         sendServer.println(password);
         printsMessagesFromServer(server);
-    }
-
-    public static void IHM() {
-
     }
 }

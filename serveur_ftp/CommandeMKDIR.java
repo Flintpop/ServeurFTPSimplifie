@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
 
 public class CommandeMKDIR extends Commande{
 
@@ -10,10 +9,11 @@ public class CommandeMKDIR extends Commande{
     public void execute() {
         if (this.incorrectParameters(1)) return;
 
-        File directory = new File(CommandExecutor.addPath(commandExecutor.currentPath,commandeArgs[0]));
+        String directoryPath = CommandExecutor.addPath(commandExecutor.currentPath,commandeArgs[0]);
+        File directory = new File(directoryPath);
 
         if (directory.exists()) {
-            ps.println("2 Le dossier existe déjà");
+            ps.println("2 L'utilisateur existe déjà");
             return;
         }
 
@@ -22,6 +22,15 @@ public class CommandeMKDIR extends Commande{
             return;
         }
 
-        ps.println("0 Le dossier a été créé");
+        ps.println("1 Le dossier a été créé");
+
+        // Création de pw.txt
+        try {
+            FileOutputStream passwordFile = new FileOutputStream(CommandExecutor.addPath(directoryPath, "pw.txt"));
+            passwordFile.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

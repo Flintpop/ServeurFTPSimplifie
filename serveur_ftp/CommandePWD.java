@@ -10,17 +10,11 @@ public class CommandePWD extends Commande {
 	}
 
 	public void execute() {
+		ps.println("0 " + getPWD());
+	}
 
-		/*String s;
-		try{
-			BufferedReader br = new BufferedReader(new FileReader("pwd.txt"));
-			s = br.readLine();
-			ps.println("0 " + s);
-		}catch (Exception e){
-			e.printStackTrace();
-		}*/
-
-		ps.println("0 " + commandExecutor.currentPath);
+	public String getPWD() {
+		return commandExecutor.currentPath.substring(commandExecutor.currentPath.lastIndexOf(CommandExecutor.getFolderSeparator()));
 	}
 
 }

@@ -2,15 +2,18 @@ import java.io.File;
 import java.io.PrintStream;
 
 public class CommandExecutor {
+    // Q: What does this class does ?
+    // A: This class is the main class of the server. It is used to execute the commands sent by the client.
 
     public boolean userOk;
     public boolean pwOk;
 
     File file;
     String pathToAdd;
-
     String rootPath;
     String currentPath;
+
+    String currentServerPath;
     String currentUser;
 
     public CommandExecutor(){
@@ -25,67 +28,57 @@ public class CommandExecutor {
     }
 
     public void executeCommande(PrintStream ps, String commande) {
-        if (userOk && pwOk) {
-            // Changer de repertoire. Un (..) permet de revenir au repertoire superieur
-            if (commande.split(" ")[0].equals("cd")) {
-                (new CommandeCD(ps, commande, this)).execute();
+        if (!userOk || !pwOk) {
+            // User pas connecté
+            switch (commande.split(" ")[0]) {
+                case "pass" -> (new CommandePASS(ps, commande, this)).execute();
+
+                case "user" -> (new CommandeUSER(ps, commande, this)).execute();
+
+                default -> ps.println("2 Vous n'êtes pas connecté !");
             }
+            return;
+        }
+
+        // User connecté
+        switch (commande.split(" ")[0]) {
+            // Changer de repertoire. Un (..) permet de revenir au repertoire supérieur
+            case "cd" -> (new CommandeCD(ps, commande, this)).execute();
 
             // Télécharger un fichier
-            if (commande.split(" ")[0].equals("get")) {
-                (new CommandeGET(ps, commande, this)).execute();
-            }
+            case "get" -> (new CommandeGET(ps, commande, this)).execute();
 
             // Afficher la liste des fichiers et des dossiers du repertoire courant
-            if (commande.split(" ")[0].equals("ls")) {
-                (new CommandeLS(ps, commande, this)).execute();
-            }
+            case "ls" -> (new CommandeLS(ps, commande, this)).execute();
 
             // Afficher le repertoire courant
-            if (commande.split(" ")[0].equals("pwd")) {
-                (new CommandePWD(ps, commande, this)).execute();
-            }
+            case "pwd" -> (new CommandePWD(ps, commande, this)).execute();
 
             // Envoyer (uploader) un fichier
-            if (commande.split(" ")[0].equals("stor")) {
-                (new CommandeSTOR(ps, commande, this)).execute();
-            }
+            case "stor" -> (new CommandeSTOR(ps, commande, this)).execute();
 
             // Créer un dossier
-            if (commande.split(" ")[0].equals("mkdir")) {
-                (new CommandeMKDIR(ps, commande, this)).execute();
-            }
+            case "mkdir" -> (new CommandeMKDIR(ps, commande, this)).execute();
 
             // Supprimer un dossier vide
-            if (commande.split(" ")[0].equals("rmdir")) {
-                (new CommandeRMDIR(ps, commande, this)).execute();
-            }
-        } else {
-            if (commande.split(" ")[0].equals("pass") || commande.split(" ")[0].equals("user")) {
-                // Le mot de passe pour l'authentification
-                if (commande.split(" ")[0].equals("pass")) {
-                    (new CommandePASS(ps, commande, this)).execute();
-                }
+            case "rmdir" -> (new CommandeRMDIR(ps, commande, this)).execute();
 
-                // Le login pour l'authentification
-                if (commande.split(" ")[0].equals("user")) {
-                    (new CommandeUSER(ps, commande, this)).execute();
-                }
-            } else
-                ps.println("2 Vous n'êtes pas connecté !");
+            case "adduser" -> (new CommandeADDUSER(ps, commande, this)).execute();
+
+            default -> ps.println("2 Erreur, la commande n'existe pas");
         }
     }
 
-    public static String getFolderSeperator() {
+    public static String getFolderSeparator() {
         String OS = System.getProperty("os.name").toLowerCase();
         return (OS.contains("win")) ? "\\" : "/";
     }
 
     public static String addPath(String path, String add) {
 
-        String folderSeparator = getFolderSeperator();
+        String folderSeparator = getFolderSeparator();
 
-        // Avoir path et add bien formatté afin qu'ils puissent être ajoutés entre eux
+        // Avoir path et add bien formaté afin qu'ils puissent être ajoutés entre eux
         boolean formatted = false;
         while (!formatted) {
             if (path.endsWith(folderSeparator)) path = path.substring(0, path.length() - 1);
@@ -101,9 +94,10 @@ public class CommandExecutor {
     }
 
     public void goBackOneDirectory() {
-        String folderSeperator = getFolderSeperator();
+        // On veut revenir au repertoire supérieur (..)
+        String folderSeparator = getFolderSeparator();
 
-        currentPath = currentPath.substring(0, currentPath.lastIndexOf(folderSeperator));
+        currentPath = currentPath.substring(0, currentPath.lastIndexOf(folderSeparator));
     }
 
     public void reset() {
@@ -114,16 +108,24 @@ public class CommandExecutor {
     }
 
     public String findSubDirectory(String dir) {
-        // On veut aller dans un subdirectory
         File file = new File(currentPath);
+
+        // This line is used to get all the directories in the current path.
         String[] directories = file.list((current, name) -> new File(current, name).isDirectory());
-        if (directories != null) {
-            for (String directory : directories) {
-                if (dir.equals(directory)) {
-                    return directory;
-                }
+
+        if (directories == null) {
+            return "";
+        }
+
+        for (String directory : directories) {
+            if (dir.equals(directory)) {
+                return directory;
             }
         }
         return "";
+    }
+
+    public String getAbsolutePath() {
+        return addPath(this.rootPath, this.currentPath);
     }
 }

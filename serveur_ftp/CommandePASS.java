@@ -39,7 +39,8 @@ public class CommandePASS extends Commande {
 		commandExecutor.pwOk = true;
 		ps.println("1 Commande pass OK");
 		ps.println("0 " + commandExecutor.currentUser + " est connecté sur notre serveur");
-		commandExecutor.addPath(commandExecutor.currentPath, commandExecutor.currentUser);
+		CommandExecutor.addPath(commandExecutor.currentPath, commandExecutor.currentUser);
+		commandExecutor.currentServerPath = commandExecutor.currentUser;
 	}
 
 }

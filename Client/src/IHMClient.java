@@ -5,28 +5,31 @@ import java.net.Socket;
 import java.util.Objects;
 
 public class IHMClient extends JFrame implements ActionListener {
-    // Composants de l'interface
-    private JLabel labelUsername, labelPassword;
-    private JTextField textFieldUsername, textFieldPassword;
-    private JButton buttonConnect, buttonDownload, buttonUpload;
-    private JList<String> fileList;
+    private final JTextField textFieldUsername;
+    private final JTextField textFieldPassword;
+    private final JButton buttonConnect;
+    private final JButton buttonDownload;
+    private final JButton buttonUpload;
 
     // Socket de connexion au serveur FTP
-    private Socket socket;
+    private Socket socket = null;
+
+    BufferedReader server = null;
+    PrintWriter sendServer = null;
 
     // Constructeur
     public IHMClient() {
         super("FTP Client");
 
-        // Initialisation des composants
-        labelUsername = new JLabel("Username:");
-        labelPassword = new JLabel("Password:");
+        // Initialisation des composants de l'interface
+        JLabel labelUsername = new JLabel("Username:");
+        JLabel labelPassword = new JLabel("Password:");
         textFieldUsername = new JTextField(20);
         textFieldPassword = new JTextField(20);
         buttonConnect = new JButton("Connect");
         buttonDownload = new JButton("Download");
         buttonUpload = new JButton("Upload");
-        fileList = new JList<String>();
+        JList<String> fileList = new JList<>();
 
         // Ajout des composants à la fenêtre
         JPanel panel1 = new JPanel();
@@ -49,49 +52,34 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonDownload.addActionListener(this);
         buttonUpload.addActionListener(this);
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Code pour fermer l'application
+                System.exit(0);
+            }
+        });
+
         // Configuration de la fenêtre
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 300);
         setVisible(true);
+        addWindowListener(new WindowEventHandler());
     }
 
     // Méthode pour se connecter au serveur FTP
     private void connect() {
-        BufferedReader server;
-        PrintWriter sendServer;
-        Socket socket = null;
-
         try {
             socket = client.connectToServer(2000);
 
             server = new BufferedReader(new InputStreamReader(Objects.requireNonNull(socket).getInputStream()));
             sendServer = new PrintWriter(socket.getOutputStream(), true);
-            String commande;
 
             client.printWelcomeMessage(server);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             // Boucle principale
             sendUserData(sendServer, server);
 
-            while (!(commande = reader.readLine()).equals("bye")) {
-                sendServer.println(commande);
-                client.printsMessagesFromServer(server);
-
-                if (commande.startsWith("stor")) {
-                    client.sendFile(commande.substring(5));
-                }
-
-                if (commande.startsWith("get")) {
-                    client.getFile(commande.substring(4), server);
-                }
-
-                if (commande.startsWith("bye")) {
-                    System.out.println("Connection closed");
-                }
-            }
-
-            socket.close();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             e.printStackTrace();
@@ -139,6 +127,24 @@ public class IHMClient extends JFrame implements ActionListener {
         client.printsMessagesFromServer(server);
         sendServer.println(password);
         client.printsMessagesFromServer(server);
+    }
+
+    private class WindowEventHandler extends WindowAdapter {
+        public void windowClosing(WindowEvent evt) {
+            try {
+                // Fermer la connexion au serveur FTP ici (si elle est ouverte)
+                if (socket != null) {
+                    socket.close();
+                    if (sendServer != null)
+                        sendServer.println("bye");
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            // Fermer l'application
+            System.exit(0);
+        }
     }
 
     // Méthode principale pour lancer l'application
