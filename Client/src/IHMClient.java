@@ -57,17 +57,6 @@ public class IHMClient extends JFrame implements ActionListener {
         panel1.add(buttonConnect);
         panel1.add(buttonADDUSER);
 
-        panel2 = new JPanel();
-        panel2.add(new JScrollPane(fileList));
-        panel2.add(buttonDownload);
-        panel2.add(buttonUpload);
-        JPanel panel3 = new JPanel();
-        panel3.add(new JLabel("New directory name:"));
-        panel3.add(textFieldNewDir);
-        panel3.add(buttonMKDIR);
-        panel3.add(new JLabel("Directory name to remove:"));
-        panel3.add(textFieldRMDir);
-        panel3.add(buttonRMDIR);
 
         getContentPane().add(panel1, "North");
 
@@ -89,9 +78,12 @@ public class IHMClient extends JFrame implements ActionListener {
 
         // Configuration de la fenêtre
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1500, 300);
-        setVisible(true);
+        frame1.setSize(1500, 300);
+        frame2.setSize(1500, 300);
         addWindowListener(new WindowEventHandler());
+        frame2.setVisible(true);
+        frame1.setVisible(true);
+        this.pack();
     }
 
     // Méthode pour se connecter au serveur FTP
@@ -153,10 +145,11 @@ public class IHMClient extends JFrame implements ActionListener {
     }
 
     public void sendUserData(PrintWriter sendServer, BufferedReader server) {
-        String user = "user " + this.textFieldUsername.getText();
-        String password = "pass " + this.textFieldPassword.getText();
+        //String user = "user " + this.textFieldUsername.getText();
+        //String password = "pass " + this.textFieldPassword.getText();
         boolean userConnected;
-
+        String user = "user abdelaziz";
+        String password = "pass abdoul";
         // Send data to server
         sendServer.println(user);
         userConnected = client.printsMessagesFromServer(server);
@@ -168,9 +161,9 @@ public class IHMClient extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             return;
         }
-        JOptionPane.showMessageDialog(this, "Connected to FTP server.");
-        getContentPane().add(panel2, "Center");
-        getContentPane().add(panel3, "North");
+
+        frame1.setVisible(false);
+        frame2.setVisible(true);
     }
 
     public void sendNewUser(PrintWriter sendServer, BufferedReader server) {
