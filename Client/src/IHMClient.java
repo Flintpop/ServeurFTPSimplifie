@@ -7,7 +7,14 @@ import java.util.Objects;
 public class IHMClient extends JFrame implements ActionListener {
     private final JTextField textFieldUsername;
     private final JTextField textFieldPassword;
+    private final JTextField textFieldNewDir;
+    private final JTextField textFieldNewUser;
+    private final JTextField textFieldNewPassword;
+    private final JTextField textFieldRMDir;
     private final JButton buttonConnect;
+    private final JButton buttonMKDIR;
+    private final JButton buttonRMDIR;
+    private final JButton buttonADDUSER;
     private final JButton buttonDownload;
     private final JButton buttonUpload;
 
@@ -29,9 +36,16 @@ public class IHMClient extends JFrame implements ActionListener {
         JLabel labelPassword = new JLabel("Password:");
         textFieldUsername = new JTextField(20);
         textFieldPassword = new JTextField(20);
+        textFieldNewDir = new JTextField(20);
+        textFieldNewUser = new JTextField(20);
+        textFieldNewPassword = new JTextField(20);
+        textFieldRMDir = new JTextField(20);
         buttonConnect = new JButton("Connect");
         buttonDownload = new JButton("Download");
         buttonUpload = new JButton("Upload");
+        buttonMKDIR = new JButton("Make new directory");
+        buttonRMDIR = new JButton("Remove directory");
+        buttonADDUSER = new JButton("Add user");
         JList<String> fileList = new JList<>();
 
         // Ajout des composants à la fenêtre
@@ -41,19 +55,29 @@ public class IHMClient extends JFrame implements ActionListener {
         panel1.add(labelPassword);
         panel1.add(textFieldPassword);
         panel1.add(buttonConnect);
+        panel1.add(buttonADDUSER);
 
         panel2 = new JPanel();
         panel2.add(new JScrollPane(fileList));
         panel2.add(buttonDownload);
         panel2.add(buttonUpload);
+        JPanel panel3 = new JPanel();
+        panel3.add(new JLabel("New directory name:"));
+        panel3.add(textFieldNewDir);
+        panel3.add(buttonMKDIR);
+        panel3.add(new JLabel("Directory name to remove:"));
+        panel3.add(textFieldRMDir);
+        panel3.add(buttonRMDIR);
 
         getContentPane().add(panel1, "North");
-        getContentPane().add(panel2, "Center");
 
         // Ajout des écouteurs d'événements aux boutons
         buttonConnect.addActionListener(this);
         buttonDownload.addActionListener(this);
         buttonUpload.addActionListener(this);
+        buttonMKDIR.addActionListener(this);
+        buttonRMDIR.addActionListener(this);
+        buttonADDUSER.addActionListener(this);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -65,7 +89,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
         // Configuration de la fenêtre
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 300);
+        setSize(1500, 300);
         setVisible(true);
         addWindowListener(new WindowEventHandler());
     }
@@ -119,6 +143,12 @@ public class IHMClient extends JFrame implements ActionListener {
             download();
         } else if (e.getSource() == buttonUpload) {
             upload();
+        } else if (e.getSource() == buttonMKDIR) {
+            sendNewDir(sendServer, server);
+        } else if (e.getSource() == buttonRMDIR) {
+            sendRmDir(sendServer, server);
+        } else if (e.getSource() == buttonADDUSER) {
+            sendNewUser(sendServer, server);
         }
     }
 
@@ -141,6 +171,30 @@ public class IHMClient extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "Connected to FTP server.");
         getContentPane().add(panel2, "Center");
         getContentPane().add(panel3, "North");
+    }
+
+    public void sendNewUser(PrintWriter sendServer, BufferedReader server) {
+        String newUser = "adduser " + this.textFieldNewUser.getText() + " " + this.textFieldNewPassword.getText();
+
+        // Send data to server
+        sendServer.println(newUser);
+        client.printsMessagesFromServer(server);
+    }
+
+    public void sendNewDir(PrintWriter sendServer, BufferedReader server) {
+        String newDir = "mkdir " + this.textFieldNewDir.getText();
+
+        // Send data to server
+        sendServer.println(newDir);
+        client.printsMessagesFromServer(server);
+    }
+
+    public void sendRmDir(PrintWriter sendServer, BufferedReader server) {
+        String rmDir = "rmdir " + this.textFieldRMDir.getText();
+
+        // Send data to server
+        sendServer.println(rmDir);
+        client.printsMessagesFromServer(server);
     }
 
     private class WindowEventHandler extends WindowAdapter {
