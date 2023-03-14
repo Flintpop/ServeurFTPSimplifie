@@ -138,8 +138,8 @@ public class client {
     /**
      * Essaie de se connecter au serveur via un socket TCP. Si cela n'est pas possible, la fonction affiche
      * "Connection failed. Trying again in 1 second"
-     * @param port
-     * @return
+     * @param port Le port du serveur
+     * @return Un socket connecté ou non
      */
     public static Socket connectToServerTry(int port) {
         Socket socket;

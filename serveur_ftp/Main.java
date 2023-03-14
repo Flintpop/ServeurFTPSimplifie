@@ -55,6 +55,8 @@ public class Main implements Runnable {
         } catch (NullPointerException e) {
             // Client déconnecté normalement
             System.err.println("Le client s'est déconnecté.");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
             closeSocket(commandExecutor);
 
         } catch (Exception e) {

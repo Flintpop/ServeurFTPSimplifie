@@ -17,6 +17,9 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JButton buttonADDUSER;
     private final JButton buttonDownload;
     private final JButton buttonUpload;
+    private final JLabel labelUsername;
+    private final JLabel labelPassword;
+    JList<String> fileList;
 
     // Socket de connexion au serveur FTP
     private Socket socket = null;
@@ -24,16 +27,19 @@ public class IHMClient extends JFrame implements ActionListener {
     BufferedReader server = null;
     PrintWriter sendServer = null;
 
+    JPanel panel1;
     JPanel panel2;
     JPanel panel3;
+    JFrame frame1;
+    JFrame frame2;
 
     // Constructeur
     public IHMClient() {
         super("FTP Client");
 
         // Initialisation des composants de l'interface
-        JLabel labelUsername = new JLabel("Username:");
-        JLabel labelPassword = new JLabel("Password:");
+        labelUsername = new JLabel("Username:");
+        labelPassword = new JLabel("Password:");
         textFieldUsername = new JTextField(20);
         textFieldPassword = new JTextField(20);
         textFieldNewDir = new JTextField(20);
@@ -46,10 +52,10 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR = new JButton("Make new directory");
         buttonRMDIR = new JButton("Remove directory");
         buttonADDUSER = new JButton("Add user");
-        JList<String> fileList = new JList<>();
+        fileList = new JList<>();
 
         // Ajout des composants à la fenêtre
-        JPanel panel1 = new JPanel();
+        panel1 = new JPanel();
         panel1.add(labelUsername);
         panel1.add(textFieldUsername);
         panel1.add(labelPassword);
@@ -58,8 +64,25 @@ public class IHMClient extends JFrame implements ActionListener {
         panel1.add(buttonADDUSER);
 
 
-        getContentPane().add(panel1, "North");
+        frame1 = new JFrame("Connexion");
+        frame2 = new JFrame("FTP");
 
+        frame1.add(panel1, "North");
+
+        panel2 = new JPanel();
+        panel2.add(new JScrollPane(fileList));
+        panel2.add(buttonDownload);
+        panel2.add(buttonUpload);
+        panel3 = new JPanel();
+        panel3.add(new JLabel("New directory's name:"));
+        panel3.add(textFieldNewDir);
+        panel3.add(buttonMKDIR);
+        panel3.add(new JLabel("Directory's name to remove:"));
+        panel3.add(textFieldRMDir);
+        panel3.add(buttonRMDIR);
+
+        frame2.add(panel2, "Center");
+        frame2.add(panel3, "North");
         // Ajout des écouteurs d'événements aux boutons
         buttonConnect.addActionListener(this);
         buttonDownload.addActionListener(this);
@@ -94,11 +117,14 @@ public class IHMClient extends JFrame implements ActionListener {
 
             server = new BufferedReader(new InputStreamReader(Objects.requireNonNull(socket).getInputStream()));
             sendServer = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             client.printWelcomeMessage(server);
 
             // Boucle principale
             sendUserData(sendServer, server);
+            sendServer.println(reader.readLine());
+
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
@@ -106,6 +132,13 @@ public class IHMClient extends JFrame implements ActionListener {
             throw new RuntimeException(e);
         } catch (Exception e) {
             System.err.println("Erreur le serveur s'est brusquement arrêté");
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            try {
+                Thread.sleep(5000000);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
 
             // Fermer le socket proprement
             try {
