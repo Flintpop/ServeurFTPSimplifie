@@ -55,19 +55,9 @@ public class IHMClient extends JFrame implements ActionListener {
         fileList = new JList<>();
 
         // Ajout des composants à la fenêtre
-        panel1 = new JPanel();
-        panel1.add(labelUsername);
-        panel1.add(textFieldUsername);
-        panel1.add(labelPassword);
-        panel1.add(textFieldPassword);
-        panel1.add(buttonConnect);
-        panel1.add(buttonADDUSER);
 
-
-        frame1 = new JFrame("Connexion");
+        initConnectFrame();
         frame2 = new JFrame("FTP");
-
-        frame1.add(panel1, "North");
 
         panel2 = new JPanel();
         panel2.add(new JScrollPane(fileList));
@@ -104,9 +94,21 @@ public class IHMClient extends JFrame implements ActionListener {
         frame1.setSize(1500, 300);
         frame2.setSize(1500, 300);
         addWindowListener(new WindowEventHandler());
-        frame2.setVisible(true);
         frame1.setVisible(true);
-        this.pack();
+        frame2.setVisible(false);
+    }
+
+    public void initConnectFrame() {
+        panel1 = new JPanel();
+        panel1.add(labelUsername);
+        panel1.add(textFieldUsername);
+        panel1.add(labelPassword);
+        panel1.add(textFieldPassword);
+        panel1.add(buttonConnect);
+        panel1.add(buttonADDUSER);
+
+        frame1 = new JFrame("Connexion");
+        frame1.add(panel1, "North");
     }
 
     // Méthode pour se connecter au serveur FTP
@@ -117,15 +119,11 @@ public class IHMClient extends JFrame implements ActionListener {
 
             server = new BufferedReader(new InputStreamReader(Objects.requireNonNull(socket).getInputStream()));
             sendServer = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             client.printWelcomeMessage(server);
 
-            // Boucle principale
             sendUserData(sendServer, server);
-            sendServer.println(reader.readLine());
-
-
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             e.printStackTrace();
