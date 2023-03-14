@@ -107,8 +107,8 @@ public class CommandExecutor {
         currentUser = "";
     }
 
-    public String findSubDirectory(String dir) {
-        File file = new File(currentPath);
+    public String findSubDirectory(String dir, String basePath) {
+        File file = new File(basePath);
 
         // This line is used to get all the directories in the current path.
         String[] directories = file.list((current, name) -> new File(current, name).isDirectory());
@@ -125,6 +125,9 @@ public class CommandExecutor {
         return "";
     }
 
+    public String findSubDirectory(String dir) {
+        return findSubDirectory(dir, this.currentPath);
+    }
     public String getAbsolutePath() {
         return addPath(this.rootPath, this.currentPath);
     }

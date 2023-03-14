@@ -22,7 +22,7 @@ public class CommandeMKDIR extends Commande{
             return;
         }
 
-        ps.println("1 Le dossier a été créé");
+        ps.println("0 Le dossier a été créé");
 
         // Création de pw.txt
         try {

@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
 
 public class CommandeADDUSER extends Commande {
     public CommandeADDUSER(PrintStream ps, String commande, CommandExecutor commandExecutor) {
@@ -10,18 +9,14 @@ public class CommandeADDUSER extends Commande {
     public void execute() {
         // adduser nom motdepasse
         if (incorrectParameters(2)) return;
+        String userName = commandeArgs[0];
 
-
-        // Il faut vérifier que l'user n'existe pas déjà.
-        // Il faut créer un dossier.
-        // Ajouter un mot de passe.
-
-        if (!commandExecutor.findSubDirectory(commandeArgs[0]).equals("")) {
+        if (!commandExecutor.findSubDirectory(userName, commandExecutor.rootPath).equals("")) {
             ps.println("2 Erreur, l'user existe déjà");
             return;
         }
 
-        File directory = new File(CommandExecutor.addPath(commandExecutor.currentPath,commandeArgs[0]));
+        File directory = new File(CommandExecutor.addPath(commandExecutor.rootPath, userName));
 
         if (directory.exists()) {
             ps.println("2 Le dossier existe déjà");
@@ -33,6 +28,22 @@ public class CommandeADDUSER extends Commande {
             return;
         }
 
-        ps.println("0 Le dossier a été créé");
+        ps.println("1 Le dossier a été créé");
+
+        String filePath = CommandExecutor.addPath(commandExecutor.rootPath, userName);
+        filePath = CommandExecutor.addPath(filePath, "pw.txt");
+
+        try {
+            BufferedWriter fos = new BufferedWriter(new FileWriter(filePath));
+
+            fos.write(commandeArgs[1]);
+
+            fos.close();
+            ps.println("0 Le mot de passe a été enregistré");
+        } catch (IOException e) {
+            ps.println("2 Erreur lors de la création du fichier de mot de passe");
+            System.err.println("Erreur lors de la création du fichier de mot de passe");
+            throw new RuntimeException(e);
+        }
     }
 }
