@@ -129,7 +129,7 @@ public class CommandExecutor {
     }
 
     public String findSubDirectory(String dir) {
-        return findSubDirectory(dir, this.currentPath);
+        return findSubDirectory(dir, getAbsolutePath());
     }
     public String getAbsolutePath() {
         return addPath(this.rootPath, this.currentPath);

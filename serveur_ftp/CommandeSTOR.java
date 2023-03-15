@@ -12,7 +12,8 @@ public class CommandeSTOR extends Commande {
         if (this.incorrectParameters(1)) return;
 
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
-        String filepath = CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]);
+        String filepath = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentPath);
+        filepath = CommandExecutor.addPath(filepath, commandeArgs[0]);
 
         try (ServerSocket dataSocket = new ServerSocket(4000)) {// créer une socket serveur sur le port 4000
             Socket socket = dataSocket.accept(); // attendre la connexion d'un client
@@ -20,6 +21,7 @@ public class CommandeSTOR extends Commande {
             InputStream in = socket.getInputStream();// récupérer le flux d'entrée du socket
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String res = br.readLine();
+
             if (res.equals("fail")) {
                 System.out.println("Erreur lors de la création du fichier");
                 return;
@@ -31,11 +33,17 @@ public class CommandeSTOR extends Commande {
             int count;
             // absolutepath = new File(filepath).getAbsolutePath();
             // On copie le fichier
+            int somOctetsEnvoye = 0;
             while ((count = in.read(buffer)) > 0) {
                 String s = new String(buffer, 0, count);// convertir le tableau de byte en String
                 System.out.println(s);
+                somOctetsEnvoye += count;
                 file.write(buffer, 0, count);// écrire dans le fichier
             }
+
+            ps.println("1 " + somOctetsEnvoye + " octets envoyés");
+            ps.println("0 Transfert terminé");
+
             file.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
