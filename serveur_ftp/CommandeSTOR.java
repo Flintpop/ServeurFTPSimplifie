@@ -12,7 +12,8 @@ public class CommandeSTOR extends Commande {
         if (this.incorrectParameters(1)) return;
 
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
-        String filepath = CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]);
+        String filepath = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentPath);
+        filepath = CommandExecutor.addPath(filepath, commandeArgs[0]);
 
         try (ServerSocket dataSocket = new ServerSocket(4000)) {// créer une socket serveur sur le port 4000
             Socket socket = dataSocket.accept(); // attendre la connexion d'un client

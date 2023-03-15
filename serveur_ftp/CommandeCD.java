@@ -23,7 +23,7 @@ public class CommandeCD extends Commande {
     }
 
     private void goBackOneDirectory() {
-        String path = CommandExecutor.addPath(commandExecutor.rootPath, commandExecutor.currentUser);
+        String path = CommandExecutor.getFolderSeparator() + commandExecutor.currentUser;
         if (commandExecutor.currentPath.equals(path)) {
             ps.println("2 Vous êtes déjà à la racine de votre espace");
             return;
