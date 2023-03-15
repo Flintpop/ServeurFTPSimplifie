@@ -30,6 +30,7 @@ public class CommandeCD extends Commande {
         }
 
         commandExecutor.goBackOneDirectory();
+        ps.println("0 Nouveau chemin : " + commandExecutor.currentPath);
     }
 
     private void goToDirectory(String directory) {

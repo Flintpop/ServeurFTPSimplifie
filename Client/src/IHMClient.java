@@ -201,6 +201,7 @@ public class IHMClient extends JFrame implements ActionListener {
         int index = fileList.getSelectedIndex();
         if (index == 0) {
             sendServer.println("cd ..");
+            client.printsMessagesFromServer(server);
             displayCurrentFolder();
             return;
         }
