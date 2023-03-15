@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class client {
@@ -23,6 +24,14 @@ public class client {
 //            sendUserData(sendServer, server);
 
             while (!(commande = reader.readLine()).equals("bye")) {
+                // Il faut voir si le fichier existe ICI
+                if (commande.startsWith("stor")) {
+                    File f = new File(commande.substring(5));
+                    if (!f.exists()) {
+                        System.err.println("Fichier introuvable");
+                        continue;
+                    }
+                }
                 sendServer.println(commande);
                 printsMessagesFromServer(server);
 
@@ -48,16 +57,26 @@ public class client {
     }
 
     private static void manageSpecialsCommands(String commande, BufferedReader server) {
-        if (commande.startsWith("stor")) {
+        if (commande.startsWith("stor") && !commande.substring(5).equals("pw.txt")) {
             sendFile(commande.substring(5), server);
         } else if (commande.startsWith("get")) {
             getFile(commande.substring(4), server);
         } else if (commande.startsWith("bye")) {
             System.out.println("Connection closed");
         }
+
+        if (commande.startsWith("stor") && commande.substring(5).equals("pw.txt")) {
+            System.err.println("Vous ne pouvez pas envoyer ce fichier");
+        }
     }
 
     public static void getFile(String fileName, BufferedReader server) {
+
+        String msg = getMessageFromServer(server);
+        if (msg.startsWith("2")) {
+            System.err.println("Le fichier n'existe pas");
+            return;
+        }
 
         try (Socket socketFile = connectToServer(4000)) {
 
@@ -104,23 +123,16 @@ public class client {
             sendFile = socketFile.getOutputStream();
             PrintStream ps = new PrintStream(sendFile);
 
-            if (fileName.equals("pw.txt")) {
-                System.err.println("Vous ne pouvez pas envoyer ce fichier");
-                ps.println("fail");
-                return;
-            }
-
             try {
                 file = new FileInputStream(fileName);
 
-
                 byte[] buffer = new byte[bufferSize];
-                int count = file.read(buffer);
+                int count;
 
-                ps.println("ok");
-                while ((count) > 0) {
+                System.out.println("Sending file...");
+                while ((count = file.read(buffer)) > 0) {
+                    System.out.println("Sending " + count + " bytes");
                     sendFile.write(buffer, 0, count);
-                    count = file.read(buffer);
                 }
 
                 socketFile.close();
@@ -134,7 +146,6 @@ public class client {
                     System.out.println("Failed to delete the file");
                 }
                 System.err.println("Fichier introuvable");
-                ps.println("fail");
             } finally {
                 Objects.requireNonNull(socketFile).close();
             }

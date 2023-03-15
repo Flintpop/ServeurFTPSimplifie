@@ -13,8 +13,17 @@ public class CommandeGET extends Commande {
 
         ps.println("0 Nouveau socket sur le port 4000 est créé pour la transmission des données");
 
+        File f = new File(CommandExecutor.addPath(commandExecutor.getAbsolutePath(), commandeArgs[0]));
+        if (!f.exists()) {
+//                out.write("Le fichier n'existe pas".getBytes());
+            ps.println("2 Le fichier n'existe pas");
+            return;
+        }
+
+        ps.println("0 Le fichier existe");
         try (ServerSocket socketTransfer = new ServerSocket(4000)) {
             Socket socketCli = socketTransfer.accept();
+
 
             OutputStream out = socketCli.getOutputStream();
             InputStream fis = new FileInputStream(CommandExecutor.addPath(commandExecutor.getAbsolutePath(), commandeArgs[0]));

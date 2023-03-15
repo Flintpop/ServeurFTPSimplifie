@@ -33,6 +33,9 @@ public class CommandePASS extends Commande {
             if (!commandeArgs[0].equals(str)) {
                 ps.println("2 Le mot de passe est faux");
                 commandExecutor.currentUser = "";
+                commandExecutor.currentPath = "";
+                commandExecutor.userOk = false;
+                commandExecutor.pwOk = false;
                 return;
             }
         } catch (Exception e) {

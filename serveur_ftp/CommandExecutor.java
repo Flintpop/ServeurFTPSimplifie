@@ -22,7 +22,7 @@ public class CommandExecutor {
         pathToAdd = addPath("serveur_ftp", "root");
         rootPath = addPath(file.getAbsoluteFile().toString().
                 replace(".", ""), pathToAdd).replace("\\\\", "\\");
-        currentPath = rootPath;
+        currentPath = "";
         currentUser = "";
     }
 

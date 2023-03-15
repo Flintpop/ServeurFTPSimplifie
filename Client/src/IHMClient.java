@@ -71,7 +71,7 @@ public class IHMClient extends JFrame implements ActionListener {
         frame2 = new JFrame("FTP");
 
         panel2 = new JPanel();
-        panel2.add(textPWD = new JTextArea(2, 100));
+        panel2.add(textPWD = new JTextArea(1, 100));
         panel2.add(new JScrollPane(fileList));
 
         fileList.addMouseListener(new MouseAdapter(){
@@ -179,6 +179,22 @@ public class IHMClient extends JFrame implements ActionListener {
     // Méthode pour télécharger un fichier depuis le serveur FTP
     private void download() {
         // Code pour télécharger un fichier depuis le serveur FTP
+        String fileName = fileList.getSelectedValue();
+        if (fileName == null) {
+            JOptionPane.showMessageDialog(this, "Please select a file.");
+            return;
+        }
+
+        if (fileName.equals("..")) {
+            JOptionPane.showMessageDialog(this, "You can't download this file.");
+            return;
+        }
+
+        fileName = fileName.substring(5);
+        if (fileName.equals("pw.txt")) {
+            JOptionPane.showMessageDialog(this, "You can't download this file.");
+            return;
+        }
         sendServer.println("get " + fileList.getSelectedValue().substring(5));
         client.printsMessagesFromServer(server);
         client.getFile(fileList.getSelectedValue().substring(5), server);
@@ -186,6 +202,24 @@ public class IHMClient extends JFrame implements ActionListener {
 
     // Méthode pour téléverser un fichier vers le serveur FTP
     private void upload() {
+        String fileName = textFieldStor.getText();
+        if (fileName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a file name.");
+            return;
+        }
+
+        if (fileName.equals("pw.txt")) {
+            JOptionPane.showMessageDialog(this, "You can't upload this file.");
+            return;
+        }
+
+        File f = new File(fileName);
+
+        if (!f.exists()) {
+            JOptionPane.showMessageDialog(this, "File does not exist.");
+            return;
+        }
+
         sendServer.println("stor " + textFieldStor.getText());
         client.printsMessagesFromServer(server);
         client.sendFile(textFieldStor.getText(), server);
