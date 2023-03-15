@@ -12,7 +12,6 @@ public class CommandExecutor {
     String pathToAdd;
     String rootPath;
     String currentPath;
-
     String currentServerPath;
     String currentUser;
 
