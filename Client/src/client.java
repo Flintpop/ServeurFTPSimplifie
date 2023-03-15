@@ -20,7 +20,7 @@ public class client {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             // Boucle principale
-            sendUserData(sendServer, server);
+//            sendUserData(sendServer, server);
 
             while (!(commande = reader.readLine()).equals("bye")) {
                 sendServer.println(commande);
@@ -103,6 +103,12 @@ public class client {
             Socket socketFile = connectToServer(4000);
             sendFile = socketFile.getOutputStream();
             PrintStream ps = new PrintStream(sendFile);
+
+            if (fileName.equals("pw.txt")) {
+                System.err.println("Vous ne pouvez pas envoyer ce fichier");
+                ps.println("fail");
+                return;
+            }
 
             try {
                 file = new FileInputStream(fileName);

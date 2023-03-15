@@ -20,7 +20,7 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JButton buttonRMDIR;
     private final JButton buttonADDUSER;
     private final JButton buttonDownload;
-    private final JButton buttonChangeDirectory;
+    private final JButton buttonDeleteDirectory;
     private final JButton buttonUpload;
     private final JLabel labelUsername;
     private final JLabel labelPassword;
@@ -59,7 +59,7 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR = new JButton("Make new directory");
         buttonRMDIR = new JButton("Remove directory");
         buttonADDUSER = new JButton("Add user");
-        buttonChangeDirectory = new JButton("Change directory");
+        buttonDeleteDirectory = new JButton("Delete file");
 
         stringFolderFilesList = new DefaultListModel<>();
         fileList = new JList<>(stringFolderFilesList);
@@ -83,17 +83,9 @@ public class IHMClient extends JFrame implements ActionListener {
             }
         });
         JScrollPane comp = new JScrollPane(fileList);
-        comp.addMouseListener(new MouseAdapter(){
-            @Override
-            public void mouseClicked(MouseEvent e){
-                if(e.getClickCount()==2){
-                    changeDirectorySelect(sendServer, server);
-                }
-            }
-        });
         panel2.add(comp);
         panel2.add(buttonDownload);
-        panel2.add(buttonChangeDirectory);
+        panel2.add(buttonDeleteDirectory);
         panel2.add(buttonRMDIR);
 
         panel3 = new JPanel();
@@ -118,7 +110,7 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR.addActionListener(this);
         buttonRMDIR.addActionListener(this);
         buttonADDUSER.addActionListener(this);
-        buttonChangeDirectory.addActionListener(this);
+        buttonDeleteDirectory.addActionListener(this);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -137,7 +129,6 @@ public class IHMClient extends JFrame implements ActionListener {
         frame1.addWindowListener(new WindowEventHandler());
         frame1.setVisible(true);
         frame2.setVisible(false);
-        connect();
     }
 
     public void initConnectFrame() {
@@ -198,7 +189,7 @@ public class IHMClient extends JFrame implements ActionListener {
         sendServer.println("stor " + textFieldStor.getText());
         client.printsMessagesFromServer(server);
         client.sendFile(textFieldStor.getText(), server);
-        getAndProcessLSCall();
+        displayCurrentFolder();
     }
 
     // Méthode pour gérer les événements des boutons
@@ -215,9 +206,24 @@ public class IHMClient extends JFrame implements ActionListener {
             sendRmDir(sendServer, server);
         } else if (e.getSource() == buttonADDUSER) {
             sendNewUser(sendServer, server);
-        } else if (e.getSource() == buttonChangeDirectory) {
-            changeDirectory(sendServer, server);
+        } else if (e.getSource() == buttonDeleteDirectory) {
+            deleteFile(sendServer, server);
         }
+    }
+
+    private void deleteFile(PrintWriter sendServer, BufferedReader server) {
+        if (fileList.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a file.");
+            return;
+        }
+
+        String rmCommand = "rm " + fileList.getSelectedValue().substring(5);
+
+        // Send data to server
+        sendServer.println(rmCommand);
+        boolean res = client.printsMessagesFromServer(server);
+        if (!res) JOptionPane.showMessageDialog(this, "Could not delete file.");
+        displayCurrentFolder();
     }
 
     private void changeDirectory(PrintWriter sendServer, BufferedReader server) {
@@ -247,36 +253,14 @@ public class IHMClient extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "You did not select a directory.");
     }
 
-    private void changeDirectorySelect(PrintWriter sendServer, BufferedReader server) {
-        String selected = fileList.getSelectedValue();
-        if (selected == null) {
-            JOptionPane.showMessageDialog(this, "Please select a directory.");
-            return;
-        }
-
-        if (selected.equals("..")) {
-            sendServer.println("cd ..");
-            client.printsMessagesFromServer(server);
-            displayCurrentFolder();
-            return;
-        }
-
-        if (!selected.contains(".")) {
-            sendServer.println("cd " + selected.substring(4));
-            client.printsMessagesFromServer(server);
-            displayCurrentFolder();
-            return;
-        }
-
-        JOptionPane.showMessageDialog(this, "You did not select a directory.");
-    }
     public boolean sendUserData(PrintWriter sendServer, BufferedReader server) {
-//        String user = "user " + this.textFieldUsername.getText();
-//        String password = "pass " + this.textFieldPassword.getText();
-        boolean userConnected;
-        String user = "user abdelaziz";
-        String password = "pass abdoul";
+        String user = "user " + this.textFieldUsername.getText();
+        String password = "pass " + this.textFieldPassword.getText();
+//        String user = "user abdelaziz";
+//        String password = "pass abdoul";
+
         // Send data to server
+        boolean userConnected;
         sendServer.println(user);
         userConnected = client.printsMessagesFromServer(server);
         sendServer.println(password);
@@ -299,7 +283,8 @@ public class IHMClient extends JFrame implements ActionListener {
         // Send data to server
         sendServer.println(newUser);
         boolean res = client.printsMessagesFromServer(server);
-        if (!res) JOptionPane.showMessageDialog(this, "Could not add user. You are not an admin.");
+        if (!res) JOptionPane.showMessageDialog(this, "Could not add user.");
+        else JOptionPane.showMessageDialog(this, "User added successfully.");
     }
 
     public void sendNewDir(PrintWriter sendServer, BufferedReader server) {
@@ -353,7 +338,7 @@ public class IHMClient extends JFrame implements ActionListener {
     }
 
     public void displayCurrentFolder() {
-        ArrayList<String> listDirectories = getAndProcessLSCall();
+        ArrayList<String> listDirectories = getAndProcessLS();
         if (listDirectories == null) {
             JOptionPane.showMessageDialog(this, "Could not load this folder.");
             client.printsMessagesFromServer(server);
@@ -375,7 +360,8 @@ public class IHMClient extends JFrame implements ActionListener {
         if (pwd == null) return null;
         return pwd.substring(2);
     }
-    public ArrayList<String> getAndProcessLSCall() {
+
+    public ArrayList<String> getAndProcessLS() {
         sendServer.println("ls");
 
         ArrayList<String> directoriesAndFiles = getQueryFromServer();

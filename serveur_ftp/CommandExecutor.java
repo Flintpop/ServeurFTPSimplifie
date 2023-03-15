@@ -68,6 +68,8 @@ public class CommandExecutor {
                 else ps.println("2 Vous n'avez pas les droits pour effectuer cette commande");
             }
 
+            case "rm" -> (new CommandeRM(ps, commande, this)).execute();
+
             default -> ps.println("2 Erreur, la commande n'existe pas");
         }
     }
@@ -128,9 +130,29 @@ public class CommandExecutor {
         return "";
     }
 
+    public String findFile(String filename, String basePath) {
+        File file = new File(basePath);
+
+        String[] files = file.list((current, name) -> new File(current, name).isFile());
+
+        if (files == null) return "";
+
+        for (String curFile : files) {
+            if (filename.equals(curFile)) {
+                return curFile;
+            }
+        }
+        return "";
+    }
+
     public String findSubDirectory(String dir) {
         return findSubDirectory(dir, getAbsolutePath());
     }
+
+    public String findFile(String filename) {
+        return findFile(filename, getAbsolutePath());
+    }
+
     public String getAbsolutePath() {
         return addPath(this.rootPath, this.currentPath);
     }
