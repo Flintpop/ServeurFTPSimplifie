@@ -20,6 +20,7 @@ public class CommandeSTOR extends Commande {
             InputStream in = socket.getInputStream();// récupérer le flux d'entrée du socket
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String res = br.readLine();
+
             if (res.equals("fail")) {
                 System.out.println("Erreur lors de la création du fichier");
                 return;
@@ -31,11 +32,17 @@ public class CommandeSTOR extends Commande {
             int count;
             // absolutepath = new File(filepath).getAbsolutePath();
             // On copie le fichier
+            int somOctetsEnvoye = 0;
             while ((count = in.read(buffer)) > 0) {
                 String s = new String(buffer, 0, count);// convertir le tableau de byte en String
                 System.out.println(s);
+                somOctetsEnvoye += count;
                 file.write(buffer, 0, count);// écrire dans le fichier
             }
+
+            ps.println("1 " + somOctetsEnvoye + " octets envoyés");
+            ps.println("0 Transfert terminé");
+
             file.close();
         } catch (IOException e) {
             throw new RuntimeException(e);

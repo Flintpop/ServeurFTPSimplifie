@@ -14,7 +14,7 @@ public class CommandePWD extends Commande {
 	}
 
 	public String getPWD() {
-		return commandExecutor.currentPath.substring(commandExecutor.currentPath.lastIndexOf(CommandExecutor.getFolderSeparator()));
+		return commandExecutor.currentPath;
 	}
 
 }

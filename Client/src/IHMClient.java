@@ -194,7 +194,7 @@ public class IHMClient extends JFrame implements ActionListener {
     private void upload() {
         sendServer.println("stor " + textFieldStor.getText());
         client.printsMessagesFromServer(server);
-        client.sendFile(textFieldStor.getText());
+        client.sendFile(textFieldStor.getText(), server);
         getAndProcessLSCall();
     }
 

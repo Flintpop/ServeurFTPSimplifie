@@ -14,7 +14,7 @@ public class CommandeMKDIR extends Commande{
             return;
         }
 
-        String directoryPath = CommandExecutor.addPath(commandExecutor.currentPath,commandeArgs[0]);
+        String directoryPath = CommandExecutor.addPath(commandExecutor.getAbsolutePath(),commandeArgs[0]);
         File directory = new File(directoryPath);
 
         if (directory.exists()) {

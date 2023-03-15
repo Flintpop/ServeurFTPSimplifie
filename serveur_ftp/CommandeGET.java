@@ -17,7 +17,7 @@ public class CommandeGET extends Commande {
             Socket socketCli = socketTransfer.accept();
 
             OutputStream out = socketCli.getOutputStream();
-            InputStream fis = new FileInputStream(CommandExecutor.addPath(commandExecutor.currentPath, commandeArgs[0]));
+            InputStream fis = new FileInputStream(CommandExecutor.addPath(commandExecutor.getAbsolutePath(), commandeArgs[0]));
             byte[] buffer = new byte[1024];
             int nbOctetsLus;
             int somOctetsEnvoye = 0;

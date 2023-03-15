@@ -20,7 +20,7 @@ public class client {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             // Boucle principale
-            //sendUserData(sendServer, server);
+            sendUserData(sendServer, server);
 
             while (!(commande = reader.readLine()).equals("bye")) {
                 sendServer.println(commande);
@@ -49,7 +49,7 @@ public class client {
 
     private static void manageSpecialsCommands(String commande, BufferedReader server) {
         if (commande.startsWith("stor")) {
-            sendFile(commande.substring(5));
+            sendFile(commande.substring(5), server);
         } else if (commande.startsWith("get")) {
             getFile(commande.substring(4), server);
         } else if (commande.startsWith("bye")) {
@@ -93,7 +93,7 @@ public class client {
     }
 
 
-    public static void sendFile(String fileName) {
+    public static void sendFile(String fileName, BufferedReader server) {
         try {
             int bufferSize = 4096;
 
@@ -118,6 +118,7 @@ public class client {
                 }
 
                 socketFile.close();
+                printsMessagesFromServer(server);
             } catch (FileNotFoundException e) {
                 File testFile = new File(fileName);
                 if (testFile.delete()) {
