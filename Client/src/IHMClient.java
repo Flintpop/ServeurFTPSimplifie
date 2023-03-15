@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class IHMClient extends JFrame implements ActionListener {
@@ -20,6 +22,7 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JLabel labelUsername;
     private final JLabel labelPassword;
     JList<String> fileList;
+    DefaultListModel<String> listModel;
 
     // Socket de connexion au serveur FTP
     private Socket socket = null;
@@ -52,7 +55,11 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR = new JButton("Make new directory");
         buttonRMDIR = new JButton("Remove directory");
         buttonADDUSER = new JButton("Add user");
-        fileList = new JList<>();
+        listModel = new DefaultListModel<>();
+        listModel.addElement("Jane Doe");
+        listModel.addElement("John Smith");
+        listModel.addElement("Kathy Green");
+        fileList = new JList<>(listModel);
 
         // Ajout des composants à la fenêtre
 
@@ -124,6 +131,7 @@ public class IHMClient extends JFrame implements ActionListener {
             client.printWelcomeMessage(server);
 
             sendUserData(sendServer, server);
+            displayCurrentFolder();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             e.printStackTrace();
@@ -132,11 +140,6 @@ public class IHMClient extends JFrame implements ActionListener {
             System.err.println("Erreur le serveur s'est brusquement arrêté");
             System.err.println(e.getMessage());
             e.printStackTrace();
-            try {
-                Thread.sleep(5000000);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
 
             // Fermer le socket proprement
             try {
@@ -236,6 +239,57 @@ public class IHMClient extends JFrame implements ActionListener {
 
             // Fermer l'application
             System.exit(0);
+        }
+    }
+
+    public void displayCurrentFolder() {
+        ArrayList<String> listDirectories = getDirectoryListServer();
+        if (listDirectories == null) {
+            //TODO: Faire le afficher erreur dans popup ou dans l'endroit ou il est censé afficher le tree
+            JOptionPane.showMessageDialog(this, "ERREUR DE OUF ICI QUAND JE RECOIS LE TREE");
+            return;
+        }
+
+        // Testons
+        listModel.clear();
+        for (String listDirectory : listDirectories) {
+            listModel.addElement(listDirectory);
+        }
+        // TODO: Faire la détection de clics sur la liste JLabel voir didi lien je crois
+    }
+
+    public ArrayList<String> getDirectoryListServer() {
+        sendServer.println("ls");
+
+        ArrayList<String> directoriesAndFiles = getQueryFromServer();
+
+        if (directoriesAndFiles == null) return null;
+        directoriesAndFiles.remove(0);
+
+        for (int i = 0; i < directoriesAndFiles.size(); i++) {
+            if (directoriesAndFiles.get(i).contains("0 Fin de la liste")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
+            else {
+                directoriesAndFiles.set(i, directoriesAndFiles.get(i).substring(2));
+            }
+        }
+
+        return directoriesAndFiles;
+    }
+
+    public ArrayList<String> getQueryFromServer () {
+        String message = client.getMessageFromServer(server);
+        ArrayList<String> messages = new ArrayList<>(Collections.singleton(message));
+        char messageContinue = '1';
+        char messageErrorEnd = '2';
+
+        while (message.charAt(0) == messageContinue) {
+            message = client.getMessageFromServer(server);
+            messages.add(message);
+        }
+        if (message.charAt(0) == messageErrorEnd) {
+            return null;
+        } else {
+            return messages;
         }
     }
 

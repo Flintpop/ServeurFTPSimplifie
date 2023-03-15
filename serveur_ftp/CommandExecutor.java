@@ -63,7 +63,11 @@ public class CommandExecutor {
             // Supprimer un dossier vide
             case "rmdir" -> (new CommandeRMDIR(ps, commande, this)).execute();
 
-            case "adduser" -> (new CommandeADDUSER(ps, commande, this)).execute();
+            case "adduser" -> {
+                if (currentUser.equals("su"))
+                    new CommandeADDUSER(ps, commande, this).execute();
+                else ps.println("2 Vous n'avez pas les droits pour effectuer cette commande");
+            }
 
             default -> ps.println("2 Erreur, la commande n'existe pas");
         }
