@@ -14,6 +14,7 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JTextField textFieldNewUser;
     private final JTextField textFieldNewPassword;
     private final JTextField textFieldStor;
+    private final JTextArea textPWD;
     private final JButton buttonConnect;
     private final JButton buttonMKDIR;
     private final JButton buttonRMDIR;
@@ -70,6 +71,7 @@ public class IHMClient extends JFrame implements ActionListener {
         frame2 = new JFrame("FTP");
 
         panel2 = new JPanel();
+        panel2.add(textPWD = new JTextArea(2, 100));
         panel2.add(new JScrollPane(fileList));
         panel2.add(buttonDownload);
         panel2.add(buttonChangeDirectory);
@@ -203,6 +205,7 @@ public class IHMClient extends JFrame implements ActionListener {
             sendServer.println("cd ..");
             client.printsMessagesFromServer(server);
             displayCurrentFolder();
+            textPWD.setText(getAndProcessPWD());
             return;
         }
 
@@ -215,6 +218,7 @@ public class IHMClient extends JFrame implements ActionListener {
             sendServer.println("cd " + stringFolderFilesList.get(index).substring(4));
             client.printsMessagesFromServer(server);
             displayCurrentFolder();
+            textPWD.setText(getAndProcessPWD());
             return;
         }
 
@@ -238,6 +242,7 @@ public class IHMClient extends JFrame implements ActionListener {
             return false;
         }
 
+        textPWD.setText(getAndProcessPWD());
         frame1.setVisible(false);
         frame2.setVisible(true);
         return true;
@@ -319,6 +324,12 @@ public class IHMClient extends JFrame implements ActionListener {
 
     }
 
+    public String getAndProcessPWD() {
+        sendServer.println("pwd");
+        String pwd = getQueryFromServer().get(1);
+        if (pwd == null) return null;
+        return pwd.substring(2);
+    }
     public ArrayList<String> getAndProcessLSCall() {
         sendServer.println("ls");
 

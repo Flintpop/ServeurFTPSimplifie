@@ -40,6 +40,6 @@ public class CommandeSTOR extends Commande {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-	}
+    }
 
 }
