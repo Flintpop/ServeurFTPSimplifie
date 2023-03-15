@@ -166,7 +166,10 @@ public class IHMClient extends JFrame implements ActionListener {
 
     // Méthode pour téléverser un fichier vers le serveur FTP
     private void upload() {
-        // Code pour téléverser un fichier vers le serveur FTP
+        sendServer.println("stor " + textFieldStor.getText());
+        client.printsMessagesFromServer(server);
+        client.sendFile(textFieldStor.getText());
+        ihmLS();
     }
 
     // Méthode pour gérer les événements des boutons
