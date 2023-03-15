@@ -9,6 +9,11 @@ public class CommandeMKDIR extends Commande{
     public void execute() {
         if (this.incorrectParameters(1)) return;
 
+        if (commandeArgs[0].contains(".") || commandeArgs[0].contains(":")) {
+            ps.println("2 Le programme ne supporte pas l'inscription du caractère '.' dans le nom");
+            return;
+        }
+
         String directoryPath = CommandExecutor.addPath(commandExecutor.currentPath,commandeArgs[0]);
         File directory = new File(directoryPath);
 
@@ -23,14 +28,5 @@ public class CommandeMKDIR extends Commande{
         }
 
         ps.println("0 Le dossier a été créé");
-
-        // Création de pw.txt
-        try {
-            FileOutputStream passwordFile = new FileOutputStream(CommandExecutor.addPath(directoryPath, "pw.txt"));
-            passwordFile.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 }

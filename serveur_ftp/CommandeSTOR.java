@@ -18,11 +18,18 @@ public class CommandeSTOR extends Commande {
             Socket socket = dataSocket.accept(); // attendre la connexion d'un client
 
             InputStream in = socket.getInputStream();// récupérer le flux d'entrée du socket
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String res = br.readLine();
+            if (res.equals("fail")) {
+                System.out.println("Erreur lors de la création du fichier");
+                return;
+            }
+
             OutputStream file = new FileOutputStream(filepath);// récupérer le flux de sortie du fichier
 
             byte[] buffer = new byte[4096];
             int count;
-//absolutepath = new File(filepath).getAbsolutePath();
+            // absolutepath = new File(filepath).getAbsolutePath();
             // On copie le fichier
             while ((count = in.read(buffer)) > 0) {
                 String s = new String(buffer, 0, count);// convertir le tableau de byte en String

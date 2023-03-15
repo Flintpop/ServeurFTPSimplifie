@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
@@ -12,17 +13,18 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JTextField textFieldNewDir;
     private final JTextField textFieldNewUser;
     private final JTextField textFieldNewPassword;
-    private final JTextField textFieldRMDir;
+    private final JTextField textFieldStor;
     private final JButton buttonConnect;
     private final JButton buttonMKDIR;
     private final JButton buttonRMDIR;
     private final JButton buttonADDUSER;
     private final JButton buttonDownload;
+    private final JButton buttonChangeDirectory;
     private final JButton buttonUpload;
     private final JLabel labelUsername;
     private final JLabel labelPassword;
     JList<String> fileList;
-    DefaultListModel<String> listModel;
+    DefaultListModel<String> stringFolderFilesList;
 
     // Socket de connexion au serveur FTP
     private Socket socket = null;
@@ -48,18 +50,18 @@ public class IHMClient extends JFrame implements ActionListener {
         textFieldNewDir = new JTextField(20);
         textFieldNewUser = new JTextField(20);
         textFieldNewPassword = new JTextField(20);
-        textFieldRMDir = new JTextField(20);
+        textFieldStor = new JTextField(20);
         buttonConnect = new JButton("Connect");
         buttonDownload = new JButton("Download");
         buttonUpload = new JButton("Upload");
         buttonMKDIR = new JButton("Make new directory");
         buttonRMDIR = new JButton("Remove directory");
         buttonADDUSER = new JButton("Add user");
-        listModel = new DefaultListModel<>();
-        listModel.addElement("Jane Doe");
-        listModel.addElement("John Smith");
-        listModel.addElement("Kathy Green");
-        fileList = new JList<>(listModel);
+        buttonChangeDirectory = new JButton("Change directory");
+
+        stringFolderFilesList = new DefaultListModel<>();
+        fileList = new JList<>(stringFolderFilesList);
+        fileList.setPreferredSize(new Dimension(500, 500));
 
         // Ajout des composants à la fenêtre
 
@@ -69,14 +71,15 @@ public class IHMClient extends JFrame implements ActionListener {
         panel2 = new JPanel();
         panel2.add(new JScrollPane(fileList));
         panel2.add(buttonDownload);
-        panel2.add(buttonUpload);
+        panel2.add(buttonChangeDirectory);
+        panel2.add(buttonRMDIR);
+
         panel3 = new JPanel();
         panel3.add(new JLabel("New directory's name:"));
         panel3.add(textFieldNewDir);
         panel3.add(buttonMKDIR);
-        panel3.add(new JLabel("Directory's name to remove:"));
-        panel3.add(textFieldRMDir);
-        panel3.add(buttonRMDIR);
+        panel3.add(textFieldStor);
+        panel3.add(buttonUpload);
 
         frame2.add(panel2, "Center");
         frame2.add(panel3, "North");
@@ -87,6 +90,7 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR.addActionListener(this);
         buttonRMDIR.addActionListener(this);
         buttonADDUSER.addActionListener(this);
+        buttonChangeDirectory.addActionListener(this);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -100,7 +104,8 @@ public class IHMClient extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame1.setSize(1500, 300);
         frame2.setSize(1500, 300);
-        addWindowListener(new WindowEventHandler());
+        frame2.addWindowListener(new WindowEventHandler());
+        frame1.addWindowListener(new WindowEventHandler());
         frame1.setVisible(true);
         frame2.setVisible(false);
     }
@@ -154,6 +159,9 @@ public class IHMClient extends JFrame implements ActionListener {
     // Méthode pour télécharger un fichier depuis le serveur FTP
     private void download() {
         // Code pour télécharger un fichier depuis le serveur FTP
+        sendServer.println("get " + fileList.getSelectedValue().substring(5));
+        client.printsMessagesFromServer(server);
+        client.getFile(fileList.getSelectedValue().substring(5), server);
     }
 
     // Méthode pour téléverser un fichier vers le serveur FTP
@@ -175,7 +183,32 @@ public class IHMClient extends JFrame implements ActionListener {
             sendRmDir(sendServer, server);
         } else if (e.getSource() == buttonADDUSER) {
             sendNewUser(sendServer, server);
+        } else if (e.getSource() == buttonChangeDirectory) {
+            changeDirectory(sendServer, server);
         }
+    }
+
+    private void changeDirectory(PrintWriter sendServer, BufferedReader server) {
+        int index = fileList.getSelectedIndex();
+        if (index == 0) {
+            sendServer.println("cd ..");
+            displayCurrentFolder();
+            return;
+        }
+
+        if (index == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a directory.");
+            return;
+        }
+
+        if (!stringFolderFilesList.get(index).contains(".")) {
+            sendServer.println("cd " + stringFolderFilesList.get(index).substring(4));
+            client.printsMessagesFromServer(server);
+            displayCurrentFolder();
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "You did not select a directory.");
     }
 
     public void sendUserData(PrintWriter sendServer, BufferedReader server) {
@@ -190,7 +223,6 @@ public class IHMClient extends JFrame implements ActionListener {
         sendServer.println(password);
         userConnected = userConnected && client.printsMessagesFromServer(server);
 
-        // S'il s'est connecté. Comment on sait ?
         if (!userConnected) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             return;
@@ -214,14 +246,30 @@ public class IHMClient extends JFrame implements ActionListener {
         // Send data to server
         sendServer.println(newDir);
         client.printsMessagesFromServer(server);
+        displayCurrentFolder();
     }
 
     public void sendRmDir(PrintWriter sendServer, BufferedReader server) {
-        String rmDir = "rmdir " + this.textFieldRMDir.getText();
+        int index = fileList.getSelectedIndex();
+        if (index == 0 || index == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a directory.");
+            return;
+        }
 
-        // Send data to server
-        sendServer.println(rmDir);
-        client.printsMessagesFromServer(server);
+        if (!stringFolderFilesList.get(index).contains(".")) {
+            sendServer.println("rmdir " + stringFolderFilesList.get(index).substring(4));
+            client.printsMessagesFromServer(server);
+            displayCurrentFolder();
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "You did not select a directory.");
+//        String rmDir = "rmdir " + this.textFieldRMDir.getText();
+//
+//        // Send data to server
+//        sendServer.println(rmDir);
+//        client.printsMessagesFromServer(server);
+//        displayCurrentFolder();
     }
 
     private class WindowEventHandler extends WindowAdapter {
@@ -243,34 +291,41 @@ public class IHMClient extends JFrame implements ActionListener {
     }
 
     public void displayCurrentFolder() {
-        ArrayList<String> listDirectories = getDirectoryListServer();
+        ArrayList<String> listDirectories = ihmLS();
         if (listDirectories == null) {
-            //TODO: Faire le afficher erreur dans popup ou dans l'endroit ou il est censé afficher le tree
-            JOptionPane.showMessageDialog(this, "ERREUR DE OUF ICI QUAND JE RECOIS LE TREE");
+            JOptionPane.showMessageDialog(this, "Could not load this folder.");
+            client.printsMessagesFromServer(server);
             return;
         }
 
         // Testons
-        listModel.clear();
+        stringFolderFilesList.clear();
         for (String listDirectory : listDirectories) {
-            listModel.addElement(listDirectory);
+            stringFolderFilesList.addElement(listDirectory);
         }
         // TODO: Faire la détection de clics sur la liste JLabel voir didi lien je crois
+
     }
 
-    public ArrayList<String> getDirectoryListServer() {
+    public ArrayList<String> ihmLS() {
         sendServer.println("ls");
 
         ArrayList<String> directoriesAndFiles = getQueryFromServer();
 
         if (directoriesAndFiles == null) return null;
-        directoriesAndFiles.remove(0);
+        directoriesAndFiles.set(0, "..");
 
+        String curItem;
         for (int i = 0; i < directoriesAndFiles.size(); i++) {
-            if (directoriesAndFiles.get(i).contains("0 Fin de la liste")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
-            else {
-                directoriesAndFiles.set(i, directoriesAndFiles.get(i).substring(2));
-            }
+            curItem = directoriesAndFiles.get(i);
+            if (curItem.contains("0 Fin de la liste")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
+            else if (curItem.contains(":")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
+        }
+        for (int i = 0; i < directoriesAndFiles.size(); i++) {
+            curItem = directoriesAndFiles.get(i);
+            if (!curItem.contains(".")) directoriesAndFiles.set(i, curItem.replaceAll("1", "📁 "));
+            else directoriesAndFiles.set(i, curItem.replaceAll("1", "🗎  "));
+
         }
 
         return directoriesAndFiles;

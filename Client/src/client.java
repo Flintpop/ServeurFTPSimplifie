@@ -68,7 +68,9 @@ public class client {
             }
 
             InputStream is = socketFile.getInputStream();
-            OutputStream fos = new FileOutputStream(directory.getName() + "/" + fileName);
+            String path = addPath(directory.getName(), fileName);
+
+            OutputStream fos = new FileOutputStream(path);
 
             byte[] buffer = new byte[1024];
             int nbOctetsLus;
@@ -99,14 +101,17 @@ public class client {
             OutputStream sendFile;
 
             Socket socketFile = connectToServer(4000);
+            sendFile = socketFile.getOutputStream();
+            PrintStream ps = new PrintStream(sendFile);
 
             try {
                 file = new FileInputStream(fileName);
-                sendFile = socketFile.getOutputStream();
+
 
                 byte[] buffer = new byte[bufferSize];
                 int count = file.read(buffer);
 
+                ps.println("ok");
                 while ((count) > 0) {
                     sendFile.write(buffer, 0, count);
                     count = file.read(buffer);
@@ -114,7 +119,15 @@ public class client {
 
                 socketFile.close();
             } catch (FileNotFoundException e) {
+                File testFile = new File(fileName);
+                if (testFile.delete()) {
+                    System.out.println("File deleted successfully");
+                }
+                else {
+                    System.out.println("Failed to delete the file");
+                }
                 System.err.println("Fichier introuvable");
+                ps.println("fail");
             } finally {
                 Objects.requireNonNull(socketFile).close();
             }
@@ -229,5 +242,29 @@ public class client {
         printsMessagesFromServer(server);
         sendServer.println(password);
         printsMessagesFromServer(server);
+    }
+
+    public static String getFolderSeparator() {
+        String OS = System.getProperty("os.name").toLowerCase();
+        return (OS.contains("win")) ? "\\" : "/";
+    }
+
+    public static String addPath(String path, String add) {
+
+        String folderSeparator = getFolderSeparator();
+
+        // Avoir path et add bien formaté afin qu'ils puissent être ajoutés entre eux
+        boolean formatted = false;
+        while (!formatted) {
+            if (path.endsWith(folderSeparator)) path = path.substring(0, path.length() - 1);
+            if (add.startsWith(folderSeparator)) add = add.substring(1);
+            if (add.endsWith(folderSeparator)) add = add.substring(0, add.length() - 1);
+
+            if (!path.endsWith(folderSeparator) || !add.startsWith(folderSeparator)) {
+                formatted = true;
+            }
+        }
+
+        return path + folderSeparator + add;
     }
 }
