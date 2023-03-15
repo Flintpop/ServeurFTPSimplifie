@@ -35,6 +35,7 @@ public class IHMClient extends JFrame implements ActionListener {
     JPanel panel1;
     JPanel panel2;
     JPanel panel3;
+    JPanel panel4;
     JFrame frame1;
     JFrame frame2;
 
@@ -81,8 +82,14 @@ public class IHMClient extends JFrame implements ActionListener {
         panel3.add(textFieldStor);
         panel3.add(buttonUpload);
 
+        panel4 = new JPanel();
+        panel4.add(textFieldNewUser);
+        panel4.add(textFieldNewPassword);
+        panel4.add(buttonADDUSER);
+
         frame2.add(panel2, "Center");
         frame2.add(panel3, "North");
+        frame2.add(panel4, "South");
         // Ajout des écouteurs d'événements aux boutons
         buttonConnect.addActionListener(this);
         buttonDownload.addActionListener(this);
@@ -117,7 +124,6 @@ public class IHMClient extends JFrame implements ActionListener {
         panel1.add(labelPassword);
         panel1.add(textFieldPassword);
         panel1.add(buttonConnect);
-        panel1.add(buttonADDUSER);
 
         frame1 = new JFrame("Connexion");
         frame1.add(panel1, "North");
@@ -135,8 +141,8 @@ public class IHMClient extends JFrame implements ActionListener {
 
             client.printWelcomeMessage(server);
 
-            sendUserData(sendServer, server);
-            displayCurrentFolder();
+            boolean connected = sendUserData(sendServer, server);
+            if (connected) displayCurrentFolder();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
             e.printStackTrace();
@@ -169,7 +175,7 @@ public class IHMClient extends JFrame implements ActionListener {
         sendServer.println("stor " + textFieldStor.getText());
         client.printsMessagesFromServer(server);
         client.sendFile(textFieldStor.getText());
-        ihmLS();
+        getAndProcessLSCall();
     }
 
     // Méthode pour gérer les événements des boutons
@@ -214,12 +220,12 @@ public class IHMClient extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "You did not select a directory.");
     }
 
-    public void sendUserData(PrintWriter sendServer, BufferedReader server) {
-        //String user = "user " + this.textFieldUsername.getText();
-        //String password = "pass " + this.textFieldPassword.getText();
+    public boolean sendUserData(PrintWriter sendServer, BufferedReader server) {
+        String user = "user " + this.textFieldUsername.getText();
+        String password = "pass " + this.textFieldPassword.getText();
         boolean userConnected;
-        String user = "user abdelaziz";
-        String password = "pass abdoul";
+//        String user = "user abdelaziz";
+//        String password = "pass abdoul";
         // Send data to server
         sendServer.println(user);
         userConnected = client.printsMessagesFromServer(server);
@@ -228,11 +234,12 @@ public class IHMClient extends JFrame implements ActionListener {
 
         if (!userConnected) {
             JOptionPane.showMessageDialog(this, "Could not connect to FTP server.");
-            return;
+            return false;
         }
 
         frame1.setVisible(false);
         frame2.setVisible(true);
+        return true;
     }
 
     public void sendNewUser(PrintWriter sendServer, BufferedReader server) {
@@ -240,7 +247,8 @@ public class IHMClient extends JFrame implements ActionListener {
 
         // Send data to server
         sendServer.println(newUser);
-        client.printsMessagesFromServer(server);
+        boolean res = client.printsMessagesFromServer(server);
+        if (!res) JOptionPane.showMessageDialog(this, "Could not add user. You are not an admin.");
     }
 
     public void sendNewDir(PrintWriter sendServer, BufferedReader server) {
@@ -294,7 +302,7 @@ public class IHMClient extends JFrame implements ActionListener {
     }
 
     public void displayCurrentFolder() {
-        ArrayList<String> listDirectories = ihmLS();
+        ArrayList<String> listDirectories = getAndProcessLSCall();
         if (listDirectories == null) {
             JOptionPane.showMessageDialog(this, "Could not load this folder.");
             client.printsMessagesFromServer(server);
@@ -310,7 +318,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
     }
 
-    public ArrayList<String> ihmLS() {
+    public ArrayList<String> getAndProcessLSCall() {
         sendServer.println("ls");
 
         ArrayList<String> directoriesAndFiles = getQueryFromServer();
@@ -324,6 +332,7 @@ public class IHMClient extends JFrame implements ActionListener {
             if (curItem.contains("0 Fin de la liste")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
             else if (curItem.contains(":")) directoriesAndFiles.remove(directoriesAndFiles.get(i));
         }
+
         for (int i = 0; i < directoriesAndFiles.size(); i++) {
             curItem = directoriesAndFiles.get(i);
             if (!curItem.contains(".")) directoriesAndFiles.set(i, curItem.replaceAll("1", "📁 "));
@@ -334,7 +343,7 @@ public class IHMClient extends JFrame implements ActionListener {
         return directoriesAndFiles;
     }
 
-    public ArrayList<String> getQueryFromServer () {
+    public ArrayList<String> getQueryFromServer() {
         String message = client.getMessageFromServer(server);
         ArrayList<String> messages = new ArrayList<>(Collections.singleton(message));
         char messageContinue = '1';
