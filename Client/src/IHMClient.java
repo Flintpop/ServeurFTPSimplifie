@@ -73,6 +73,25 @@ public class IHMClient extends JFrame implements ActionListener {
         panel2 = new JPanel();
         panel2.add(textPWD = new JTextArea(2, 100));
         panel2.add(new JScrollPane(fileList));
+
+        fileList.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount()==2){
+                    changeDirectory(sendServer, server);
+                }
+            }
+        });
+        JScrollPane comp = new JScrollPane(fileList);
+        comp.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount()==2){
+                    changeDirectorySelect(sendServer, server);
+                }
+            }
+        });
+        panel2.add(comp);
         panel2.add(buttonDownload);
         panel2.add(buttonChangeDirectory);
         panel2.add(buttonRMDIR);
@@ -109,6 +128,7 @@ public class IHMClient extends JFrame implements ActionListener {
             }
         });
 
+
         // Configuration de la fenêtre
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame1.setSize(1500, 300);
@@ -117,6 +137,7 @@ public class IHMClient extends JFrame implements ActionListener {
         frame1.addWindowListener(new WindowEventHandler());
         frame1.setVisible(true);
         frame2.setVisible(false);
+        connect();
     }
 
     public void initConnectFrame() {
@@ -201,6 +222,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
     private void changeDirectory(PrintWriter sendServer, BufferedReader server) {
         int index = fileList.getSelectedIndex();
+
         if (index == 0) {
             sendServer.println("cd ..");
             client.printsMessagesFromServer(server);
@@ -225,12 +247,35 @@ public class IHMClient extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "You did not select a directory.");
     }
 
+    private void changeDirectorySelect(PrintWriter sendServer, BufferedReader server) {
+        String selected = fileList.getSelectedValue();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Please select a directory.");
+            return;
+        }
+
+        if (selected.equals("..")) {
+            sendServer.println("cd ..");
+            client.printsMessagesFromServer(server);
+            displayCurrentFolder();
+            return;
+        }
+
+        if (!selected.contains(".")) {
+            sendServer.println("cd " + selected.substring(4));
+            client.printsMessagesFromServer(server);
+            displayCurrentFolder();
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "You did not select a directory.");
+    }
     public boolean sendUserData(PrintWriter sendServer, BufferedReader server) {
-        String user = "user " + this.textFieldUsername.getText();
-        String password = "pass " + this.textFieldPassword.getText();
+//        String user = "user " + this.textFieldUsername.getText();
+//        String password = "pass " + this.textFieldPassword.getText();
         boolean userConnected;
-//        String user = "user abdelaziz";
-//        String password = "pass abdoul";
+        String user = "user abdelaziz";
+        String password = "pass abdoul";
         // Send data to server
         sendServer.println(user);
         userConnected = client.printsMessagesFromServer(server);

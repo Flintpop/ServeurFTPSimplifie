@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class Main implements Runnable {
 
-    private Socket socket;
+    private final Socket socket;
 
     public Main(Socket socket) {
         this.socket = socket;
