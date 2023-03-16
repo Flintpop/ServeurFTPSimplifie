@@ -24,6 +24,7 @@ public class IHMClient extends JFrame implements ActionListener {
     private final JButton buttonUpload;
     private final JLabel labelUsername;
     private final JLabel labelPassword;
+    private final JButton buttonBYE;
     JList<String> fileList;
     DefaultListModel<String> stringFolderFilesList;
 
@@ -59,6 +60,7 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonMKDIR = new JButton("Make new directory");
         buttonRMDIR = new JButton("Remove directory");
         buttonADDUSER = new JButton("Add user");
+        buttonBYE = new JButton("Disconnect");
         buttonDeleteDirectory = new JButton("Delete file");
 
         stringFolderFilesList = new DefaultListModel<>();
@@ -87,6 +89,7 @@ public class IHMClient extends JFrame implements ActionListener {
         panel2.add(buttonDownload);
         panel2.add(buttonDeleteDirectory);
         panel2.add(buttonRMDIR);
+        panel2.add(buttonBYE);
 
         panel3 = new JPanel();
         panel3.add(new JLabel("New directory's name:"));
@@ -111,6 +114,7 @@ public class IHMClient extends JFrame implements ActionListener {
         buttonRMDIR.addActionListener(this);
         buttonADDUSER.addActionListener(this);
         buttonDeleteDirectory.addActionListener(this);
+        buttonBYE.addActionListener(this);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -196,7 +200,10 @@ public class IHMClient extends JFrame implements ActionListener {
             return;
         }
         sendServer.println("get " + fileList.getSelectedValue().substring(5));
-        client.printsMessagesFromServer(server);
+        if (!client.printsMessagesFromServer(server)) {
+            JOptionPane.showMessageDialog(this, "Error of unknown origin. The server may be offline.");
+            return;
+        }
         client.getFile(fileList.getSelectedValue().substring(5), server);
     }
 
@@ -221,9 +228,18 @@ public class IHMClient extends JFrame implements ActionListener {
         }
 
         sendServer.println("stor " + textFieldStor.getText());
-        client.printsMessagesFromServer(server);
-        client.sendFile(textFieldStor.getText(), server);
-        displayCurrentFolder();
+        try {
+            if (!client.printsMessagesFromServer(server)) {
+                JOptionPane.showMessageDialog(this, "Error of unknown origin. The server may be offline.");
+                return;
+            }
+            client.sendFile(textFieldStor.getText(), server);
+            displayCurrentFolder();
+
+        } catch (RuntimeException e) {
+            System.out.println("Error, server offline");
+            System.exit(0);
+        }
     }
 
     // Méthode pour gérer les événements des boutons
@@ -242,7 +258,14 @@ public class IHMClient extends JFrame implements ActionListener {
             sendNewUser(sendServer, server);
         } else if (e.getSource() == buttonDeleteDirectory) {
             deleteFile(sendServer, server);
+        } else if (e.getSource() == buttonBYE) {
+            disconnect();
         }
+    }
+
+    private void disconnect() {
+        sendServer.println("bye");
+        System.exit(0);
     }
 
     private void deleteFile(PrintWriter sendServer, BufferedReader server) {
@@ -265,7 +288,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
         if (index == 0) {
             sendServer.println("cd ..");
-            client.printsMessagesFromServer(server);
+            getQueryFromServer();
             displayCurrentFolder();
             textPWD.setText(getAndProcessPWD());
             return;
@@ -278,7 +301,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
         if (!stringFolderFilesList.get(index).contains(".")) {
             sendServer.println("cd " + stringFolderFilesList.get(index).substring(4));
-            client.printsMessagesFromServer(server);
+            getQueryFromServer();
             displayCurrentFolder();
             textPWD.setText(getAndProcessPWD());
             return;
@@ -326,7 +349,7 @@ public class IHMClient extends JFrame implements ActionListener {
 
         // Send data to server
         sendServer.println(newDir);
-        client.printsMessagesFromServer(server);
+        getQueryFromServer();
         displayCurrentFolder();
     }
 
@@ -339,18 +362,12 @@ public class IHMClient extends JFrame implements ActionListener {
 
         if (!stringFolderFilesList.get(index).contains(".")) {
             sendServer.println("rmdir " + stringFolderFilesList.get(index).substring(4));
-            client.printsMessagesFromServer(server);
+            getQueryFromServer();
             displayCurrentFolder();
             return;
         }
 
         JOptionPane.showMessageDialog(this, "You did not select a directory.");
-//        String rmDir = "rmdir " + this.textFieldRMDir.getText();
-//
-//        // Send data to server
-//        sendServer.println(rmDir);
-//        client.printsMessagesFromServer(server);
-//        displayCurrentFolder();
     }
 
     private class WindowEventHandler extends WindowAdapter {
@@ -384,8 +401,6 @@ public class IHMClient extends JFrame implements ActionListener {
         for (String listDirectory : listDirectories) {
             stringFolderFilesList.addElement(listDirectory);
         }
-        // TODO: Faire la détection de clics sur la liste JLabel voir didi lien je crois
-
     }
 
     public String getAndProcessPWD() {
@@ -414,27 +429,33 @@ public class IHMClient extends JFrame implements ActionListener {
             curItem = directoriesAndFiles.get(i);
             if (!curItem.contains(".")) directoriesAndFiles.set(i, curItem.replaceAll("1", "📁 "));
             else directoriesAndFiles.set(i, curItem.replaceAll("1", "🗎  "));
-
         }
 
         return directoriesAndFiles;
     }
 
     public ArrayList<String> getQueryFromServer() {
-        String message = client.getMessageFromServer(server);
-        ArrayList<String> messages = new ArrayList<>(Collections.singleton(message));
-        char messageContinue = '1';
-        char messageErrorEnd = '2';
+        try {
+            String message = client.getMessageFromServer(server);
+            ArrayList<String> messages = new ArrayList<>(Collections.singleton(message));
+            char messageContinue = '1';
+            char messageErrorEnd = '2';
 
-        while (message.charAt(0) == messageContinue) {
-            message = client.getMessageFromServer(server);
-            messages.add(message);
+            while (message.charAt(0) == messageContinue) {
+                message = client.getMessageFromServer(server);
+                messages.add(message);
+            }
+            if (message.charAt(0) == messageErrorEnd) {
+                return null;
+            } else {
+                return messages;
+            }
+        } catch (IOException e) {
+            System.err.println("Server offline. Closing application...");
+            JOptionPane.showMessageDialog(this, "Server offline. Closing application...");
+            System.exit(1);
         }
-        if (message.charAt(0) == messageErrorEnd) {
-            return null;
-        } else {
-            return messages;
-        }
+        return null;
     }
 
     // Méthode principale pour lancer l'application

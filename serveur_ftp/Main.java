@@ -49,6 +49,8 @@ public class Main implements Runnable {
                 commandExecutor.executeCommande(sendClient, commande);
             }
 
+            System.out.println("Le client s'est déconnecté.");
+
             socket.close();
             commandExecutor.reset();
 

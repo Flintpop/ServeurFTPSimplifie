@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class client {
@@ -72,7 +71,12 @@ public class client {
 
     public static void getFile(String fileName, BufferedReader server) {
 
-        String msg = getMessageFromServer(server);
+        String msg;
+        try {
+            msg = getMessageFromServer(server);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         if (msg.startsWith("2")) {
             System.err.println("Le fichier n'existe pas");
             return;
@@ -204,14 +208,10 @@ public class client {
      * @param server BufferedReader utilisé pour lire les messages du serveur
      * @return Le message du serveur
      */
-    public static String getMessageFromServer(BufferedReader server) {
+    public static String getMessageFromServer(BufferedReader server) throws IOException {
         String message;
 
-        try {
-            message = server.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        message = server.readLine();
 
         if (message.charAt(0) != '0' && message.charAt(0) != '1' && message.charAt(0) != '2') {
             System.err.println("Message : ");
@@ -228,21 +228,28 @@ public class client {
      * @param server BufferedReader utilisé pour lire les messages du serveur
      */
     public static boolean printsMessagesFromServer(BufferedReader server) {
-        String message = getMessageFromServer(server);
-        char messageContinue = '1';
-        char messageErrorEnd = '2';
+        try {
 
-        while (message.charAt(0) == messageContinue) {
-            System.out.println(message);
-            message = getMessageFromServer(server);
+            String message = getMessageFromServer(server);
+            char messageContinue = '1';
+            char messageErrorEnd = '2';
+
+            while (message.charAt(0) == messageContinue) {
+                System.out.println(message);
+                message = getMessageFromServer(server);
+            }
+            if (message.charAt(0) == messageErrorEnd) {
+                System.err.println(message);
+                return false;
+            } else {
+                System.out.println(message);
+                return true;
+            }
+        } catch (IOException e) {
+            System.err.println("Le serveur a fermé la connexion");
+            System.exit(0);
         }
-        if (message.charAt(0) == messageErrorEnd) {
-            System.err.println(message);
-            return false;
-        } else {
-            System.out.println(message);
-            return true;
-        }
+        return false;
     }
 
     /**
